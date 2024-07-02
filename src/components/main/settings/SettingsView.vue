@@ -77,7 +77,7 @@
           <div class="chanel-info-value">24d 24h 24min</div>
         </div>
       </div>
-      <div class="chanel-info-row">
+      <div class="chanel-info-row chanel-info-row_graph">
         <div class="chanel-info-row-item chanel-info-row-item_graph">
           <div class="chanel-info-title">
             CPU Temperature <img src="@/assets/graph-arrow.svg" alt="arrow" />
@@ -288,6 +288,9 @@ export default {
       justify-content: space-between;
       gap: rem(17px);
       width: 100%;
+      &_graph {
+        flex-wrap: wrap;
+      }
       .chanel-info-row-item {
         width: 100%;
         display: flex;
@@ -296,7 +299,10 @@ export default {
         padding: rem(12px) rem(16px);
         border: 1px solid rgba(134, 134, 139, 0.5);
         border-radius: rem(13px);
+        height: 100%;
+        justify-content: space-between;
         &_graph {
+          height: auto;
           .chanel-info-title {
             display: flex;
             flex-direction: row;
@@ -376,6 +382,15 @@ export default {
         }
       }
     }
+  }
+}
+
+@media (max-width: 1550px) {
+  .settings-wrapper .chanel-info-wrapper .chanel-info-row_graph {
+    flex-wrap: wrap;
+  }
+  .settings-wrapper .chanel-wrapper .chanel-main .chanel-id {
+    font-size: rem(14px);
   }
 }
 </style>

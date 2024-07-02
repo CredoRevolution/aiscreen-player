@@ -77,6 +77,7 @@ export default {
     padding-top: rem(45px);
     padding-bottom: rem(37px);
     padding-left: rem(67px);
+    gap: rem(30px);
   }
 }
 

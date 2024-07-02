@@ -89,7 +89,7 @@ export default {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: rem(95px);
+  gap: rem(30px);
   //   padding-left: rem(67px);
   margin: auto 0;
   .tabs-wrapper {
