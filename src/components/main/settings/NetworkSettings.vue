@@ -103,4 +103,39 @@ export default {
     }
   }
 }
+
+@media (max-width: 1600px) {
+  .network-settings {
+    .network-settings-title {
+      font-size: rem(24px);
+      line-height: rem(28px);
+
+      .arrow {
+        transform: rotateX(180deg);
+        transition: all 0.3s ease;
+        position: relative;
+        top: rem(3px);
+        &.active {
+          transform: rotateX(0deg);
+        }
+      }
+    }
+    .network-settings-wrapper {
+      gap: rem(14px);
+      .network-settings-item {
+        .item-name {
+          color: rgba(134, 134, 139, 1);
+          font-weight: 500;
+          font-size: rem(12px);
+          line-height: rem(15px);
+        }
+        .item-value {
+          font-weight: 700;
+          font-size: rem(14px);
+          line-height: rem(17px);
+        }
+      }
+    }
+  }
+}
 </style>

@@ -4,7 +4,9 @@
     <div class="chanel-wrapper">
       <div class="chanel-main">
         <div class="chanel-status">Now playing</div>
-        <div class="chanel-title">Demo channel</div>
+        <div class="chanel-title">
+          Demo channel <img src="@/assets/chanel-more.svg" alt="" />
+        </div>
         <div class="chanel-id">
           ID 9bd1a6f7-49d4-4534-8e0d-19cd43553a91
           <img src="@/assets/copy.svg" alt="copy" />
@@ -193,6 +195,13 @@ export default {
         line-height: rem(48px);
         letter-spacing: -0.02em;
         color: rgba(20, 18, 31, 1);
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: rem(17px);
+        img {
+          cursor: pointer;
+        }
       }
       .chanel-id {
         font-weight: 500;
@@ -325,6 +334,9 @@ export default {
               flex-direction: column;
               align-items: center;
               justify-content: center;
+              img {
+                width: 100%;
+              }
               .time {
                 font-size: rem(12px);
                 line-height: rem(5px);
@@ -385,11 +397,97 @@ export default {
 }
 
 @media (max-width: 1550px) {
-  .settings-wrapper .chanel-info-wrapper .chanel-info-row_graph {
-    flex-wrap: wrap;
-  }
+  //   .settings-wrapper .chanel-info-wrapper .chanel-info-row_graph {
+  //     flex-wrap: wrap;
+  //   }
   .settings-wrapper .chanel-wrapper .chanel-main .chanel-id {
     font-size: rem(14px);
+  }
+  .settings-wrapper {
+    padding: rem(24px);
+    width: rem(470px);
+    .chanel-wrapper {
+      .chanel-main {
+        .chanel-status {
+          font-weight: 500;
+          font-size: rem(14px);
+          line-height: rem(17px);
+        }
+        .chanel-title {
+          font-size: rem(37px);
+        }
+        .chanel-id {
+          font-weight: 500;
+          font-size: rem(14px);
+          line-height: rem(17px);
+          gap: rem(6px);
+        }
+        .chanel-tags {
+          gap: rem(6px);
+        }
+      }
+      .settings-btn {
+        cursor: pointer;
+        padding: rem(11px);
+        padding-bottom: rem(7px);
+        img {
+          transition: all 0.3s ease;
+        }
+
+        &:hover {
+          border: 1px solid rgba(20, 18, 31, 1);
+        }
+      }
+    }
+    .chanel-info {
+      gap: rem(31px);
+      list-style: none;
+      margin-bottom: rem(34px);
+      .chanel-info-item {
+        .chanel-info-item__name {
+          font-size: rem(11px);
+          line-height: rem(14px);
+        }
+        .chanel-info-item__value {
+          font-size: rem(14px);
+          line-height: rem(17px);
+        }
+      }
+    }
+    .chanel-info-wrapper {
+      gap: rem(14px);
+      .chanel-info-row {
+        .chanel-info-row-item {
+          &_graph {
+            .chanel-info-title {
+              gap: rem(8px);
+              cursor: pointer;
+            }
+            .chanel-info-value-wrapper {
+              font-size: rem(15px);
+              line-height: rem(21px);
+            }
+          }
+          .chanel-info-title-wrapper {
+            .chanel-info-title {
+              font-size: rem(11px);
+              line-height: rem(17px);
+            }
+          }
+          .chanel-info-title {
+            font-size: rem(11px);
+            line-height: rem(17px);
+          }
+          .chanel-info-value {
+            font-size: rem(16px);
+            line-height: rem(20px);
+            &__location {
+              padding-bottom: rem(14px);
+            }
+          }
+        }
+      }
+    }
   }
 }
 </style>

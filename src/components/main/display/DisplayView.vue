@@ -170,10 +170,20 @@ export default {
 @media (max-width: 1700px) {
   .dispay-wrapper {
     margin: auto;
-    padding-left: rem(10px);
   }
 }
 .dispay-wrapper .display-main-wrapper {
   gap: rem(25px);
+}
+
+@media (max-width: 1600px) {
+  .dispay-wrapper {
+    transform: scale(0.85);
+  }
+  .dispay-wrapper .display-main-wrapper .display-screen-wrapper {
+    img {
+      width: 90%;
+    }
+  }
 }
 </style>
