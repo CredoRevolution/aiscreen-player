@@ -87,4 +87,12 @@ export default {
     }
   }
 }
+
+@media (max-width: 1600px) {
+  .display-settings-wrapper .screen-settings-list .screen-settings-item {
+    font-size: rem(14px);
+    line-height: rem(17px);
+    padding: rem(10px) rem(12px);
+  }
+}
 </style>
