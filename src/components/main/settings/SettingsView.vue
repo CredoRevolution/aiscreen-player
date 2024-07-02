@@ -289,7 +289,6 @@ export default {
       gap: rem(17px);
       width: 100%;
       &_graph {
-        flex-wrap: wrap;
       }
       .chanel-info-row-item {
         width: 100%;
