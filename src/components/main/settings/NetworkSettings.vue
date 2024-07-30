@@ -5,7 +5,7 @@
       <img
         class="arrow"
         :class="{ active: showSettings }"
-        src="@/assets/network-expand.svg"
+        src="@/assets/img/network-expand.svg"
         alt="arrow"
       />
     </div>

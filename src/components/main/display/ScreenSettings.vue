@@ -1,7 +1,7 @@
 <template>
   <div class="display-settings-wrapper">
     <div class="screen-toggle">
-      <img src="@/assets/screen-toggle.svg" alt="screen toggle" />
+      <img src="@/assets/img/screen-toggle.svg" alt="screen toggle" />
       Screen
       <toggle-button
         :labels="{
@@ -21,15 +21,15 @@
     </div>
     <ul class="screen-settings-list">
       <li class="screen-settings-item">
-        <img src="@/assets/update.svg" alt="" />
+        <img src="@/assets/img/update.svg" alt="" />
         Update software
       </li>
       <li class="screen-settings-item">
-        <img src="@/assets/relaunch.svg" alt="" />
+        <img src="@/assets/img/relaunch.svg" alt="" />
         Relaunch app
       </li>
       <li class="screen-settings-item">
-        <img src="@/assets/reboot.svg" alt="" />
+        <img src="@/assets/img/reboot.svg" alt="" />
         Reboot hardware
       </li>
     </ul>

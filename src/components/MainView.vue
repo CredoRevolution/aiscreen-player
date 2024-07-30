@@ -1,15 +1,26 @@
 <template>
   <div id="main">
     <div class="navbar">
-      <div class="back">
-        <img src="@/assets/arrow-back.svg" alt="back" />
+      <div class="back" @click="closeSettings">
+        <img src="@/assets/img/arrow-back.svg" alt="back" />
         Back
       </div>
       <div class="title">AIScreen Player</div>
     </div>
-    <div class="main-wrapper">
+    <div class="main-wrapper" v-show="settings == false">
       <DisplayView />
-      <SettingsView />
+      <SettingsView
+        @toggleSettings="toggleSettings"
+        @openSettings="toggleSettings"
+        :playerSettings="playerSettings"
+      />
+    </div>
+    <div class="main-wrapper_settings" v-show="settings == true">
+      <SettingsMain
+        :tags="tags"
+        :settings="settings"
+        @sendPlayerData="setPlayerData"
+      />
     </div>
   </div>
 </template>
@@ -17,11 +28,44 @@
 <script>
 import DisplayView from '@/components/main/display/DisplayView.vue'
 import SettingsView from '@/components/main/settings/SettingsView.vue'
+import SettingsMain from './settings/SettingsMain.vue'
 export default {
   name: 'MainView',
   components: {
     DisplayView,
     SettingsView,
+    SettingsMain,
+  },
+  data() {
+    return {
+      settings: false,
+      tags: [
+        { name: 'tag2', code: 'tag2' },
+        { name: 'tag3', code: 'tag3' },
+        { name: 'tag4', code: 'tag4' },
+        { name: 'tag5', code: 'tag5' },
+        { name: 'tag6', code: 'tag6' },
+        { name: 'tag7', code: 'tag7' },
+        { name: 'tag8', code: 'tag8' },
+        { name: 'tag9', code: 'tag9' },
+      ],
+
+      playerSettings: {},
+    }
+  },
+  methods: {
+    toggleSettings() {
+      this.settings = !this.settings
+    },
+    closeSettings() {
+      if (this.settings == true) {
+        this.settings = false
+      }
+    },
+    setPlayerData(playerData) {
+      console.log(playerData)
+      this.playerSettings = playerData
+    },
   },
 }
 </script>
@@ -68,7 +112,7 @@ export default {
   .main-wrapper {
     display: flex;
     width: 100%;
-    height: 91%;
+    height: auto;
     flex-direction: row;
     justify-content: space-between;
     align-items: flex-start;
@@ -78,6 +122,17 @@ export default {
     padding-bottom: rem(37px);
     padding-left: rem(67px);
     gap: rem(30px);
+  }
+  .main-wrapper_settings {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    height: auto;
+    background: rgba(242, 245, 250, 1);
+    padding-right: rem(32px);
+    padding-top: rem(45px);
+    padding-bottom: rem(37px);
+    padding-left: rem(67px);
   }
 }
 

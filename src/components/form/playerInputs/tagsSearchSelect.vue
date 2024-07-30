@@ -1,31 +1,36 @@
 <template>
   <div
     @click="resetValidation"
-    :class="['select-wrapper', active ? 'active' : '']"
+    :class="['select-wrapper select-wrapper_tags', active ? 'active' : '']"
   >
-    <label class="main-screen__form-label" for="select">
+    <!-- <label class="main-screen__form-label" for="select">
       {{ defaultText }}</label
-    >
+    > -->
     <multiselect
       :options="optionsCount"
       :custom-label="selectCountry"
       :value="value"
       :allowEmpty="false"
       :searchable="search"
+      :taggable="taggable"
+      :multiple="taggable"
       :class="{
         error: $v.value && $v.value.$error,
         showValue: showValue,
         valid:
           !$v.value.$error && $v.value.$model && value?.name !== defaultText,
       }"
+      :closeOnSelect="!taggable"
       placeholder=""
       label="name"
       name="select"
       v-model="value"
-      track-by="name"
+      track-by="code"
       @select="checkState"
+      @remove="checkState"
       @open="handleOpen"
       @close="checkLabel"
+      @tag="addTag"
     >
     </multiselect>
     <p v-if="showError && !$v.value.mustBeSelected" class="error-message">
@@ -47,7 +52,7 @@ export default {
   },
   data() {
     return {
-      value: { name: this.defaultText, code: this.defaultText },
+      value: this.tagsActive,
       showError: false,
       active: false,
       showValue: false,
@@ -55,7 +60,10 @@ export default {
   },
   props: {
     optionsCount: {},
-
+    tagsActive: {
+      type: Array,
+      required: true,
+    },
     defaultText: {
       type: String,
       required: true,
@@ -90,6 +98,10 @@ export default {
       type: Boolean,
       required: false,
       default: false,
+    },
+    taggable: {
+      type: Boolean,
+      required: false,
     },
   },
   validations: {
@@ -127,7 +139,7 @@ export default {
         return
       }
       this.showValue = true
-      this.active = true
+      this.active = false
     },
     resetValidation() {
       this.$v.$reset()
@@ -141,6 +153,7 @@ export default {
       return `${name}`
     },
     checkState() {
+      this.$emit('updateActiveTags', this.value)
       if (this.formField && this.value.name) {
         this.$emit('getData', this.formPlace, this.formField, this.value.name)
         return
@@ -156,7 +169,7 @@ export default {
       this.active = true
       if (this.search) {
         const searchQuery = document.querySelector('.multiselect__input')
-        searchQuery.placeholder = this.value.name
+        searchQuery.placeholder = 'select or input tags'
       }
       this.$nextTick(() => {
         const list = this.$el.querySelector('.multiselect__content')
@@ -176,6 +189,14 @@ export default {
           }
         }
       })
+    },
+    addTag(newTag) {
+      const tag = {
+        name: newTag,
+        code: newTag.substring(0, 2) + Math.floor(Math.random() * 10000000),
+      }
+      this.optionsCount.push(tag)
+      this.value.push(tag)
     },
   },
 
@@ -198,10 +219,10 @@ export default {
 @function rem($px) {
   @return ($px / 16px) + rem;
 }
-.select-wrapper {
+.select-wrapper_tags {
   position: relative;
   cursor: pointer;
-  label {
+  .multiselect__tags-wrap {
     position: absolute;
     transition: all 0.3s ease;
     font-size: rem(17px);
@@ -213,8 +234,11 @@ export default {
     pointer-events: none;
     z-index: 1;
   }
+  .multiselect__tags {
+    height: rem(54px);
+  }
   &.active {
-    label {
+    .multiselect__tags-wrap {
       top: rem(6px);
       left: rem(15px);
       font-weight: 500;

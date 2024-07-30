@@ -1,13 +1,13 @@
 <template>
   <div class="dispay-wrapper">
     <div class="tabs-wrapper">
-      <CustomTabs @getData="rotateScreen" />
+      <CustomTabsScreen @getData="rotateScreen" />
     </div>
     <div class="display-main-wrapper">
       <ScreenSettings />
       <div class="display-screen-wrapper" ref="screenWrapper">
         <img
-          src="@/assets/screen.png"
+          src="@/assets/img/screen.png"
           alt="screen"
           class="display-screen"
           ref="screen"
@@ -40,20 +40,20 @@
 
 <script>
 import ScreenSettings from '@/components/main/display/ScreenSettings.vue'
-import CustomTabs from '@/components/form/CustomTabs.vue'
+import CustomTabsScreen from '@/components/form/CustomTabsScreen.vue'
 export default {
   name: 'DisplayView',
   components: {
     ScreenSettings,
-    CustomTabs,
+    CustomTabsScreen,
   },
   methods: {
     changeScale() {
       this.$refs.scale.style.background = `linear-gradient(to right, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) ${this.$refs.scale.value}%, rgba(255, 255, 255, 1) ${this.$refs.scale.value}%)`
       this.$refs.scaleInput.value = this.$refs.scale.value * 2
-      //   this.$refs.screen.style.transform = `scale(${
-      //     this.$refs.scale.value / 50
-      //   })`
+      this.$refs.screen.style.transform = `scale(${
+        this.$refs.scale.value / 50
+      })`
     },
     setRangeValue() {
       this.$refs.scale.value = this.$refs.scaleInput.value / 2
@@ -64,12 +64,19 @@ export default {
     },
     rotateScreen(something, value) {
       const degrees = value.slice(0, -2)
+      this.$refs.screenWrapper.style.transition = `all 0.3s ease`
       this.$refs.screen.style.transition = `all 0.3s ease`
-      this.$refs.screenWrapper.style.height = 'auto'
-      this.$refs.screen.style.transform = `rotate(${degrees}deg)`
+      this.$refs.screenWrapper.style.transform = `rotate(${degrees}deg)`
+      this.$refs.screenWrapper.style.margin = 0
       if (degrees == 90 || degrees == 270) {
-        this.$refs.screenWrapper.style.height =
+        this.$refs.screenWrapper.style.width =
           this.$refs.screen.offsetWidth + 'px'
+        this.$refs.screenWrapper.style.height =
+          this.$refs.screen.offsetHeight + 'px'
+        this.$refs.screenWrapper.style.marginTop =
+          this.$refs.screenWrapper.offsetHeight / 2 + 'px'
+        this.$refs.screenWrapper.style.marginBottom =
+          this.$refs.screenWrapper.offsetHeight / 2 + 'px'
       }
     },
   },
@@ -107,11 +114,12 @@ export default {
       justify-content: center;
       align-items: center;
       transition: all 0.3s ease;
-
+      border-radius: rem(14px);
+      border: rem(10px) solid black;
+      border-radius: rem(24px);
+      overflow: hidden;
       img {
-        border-radius: rem(14px);
-        border: rem(10px) solid black;
-        border-radius: rem(24px);
+        width: 100%;
       }
     }
     .display-scale-wrapper {
@@ -181,9 +189,7 @@ export default {
     transform: scale(0.85);
   }
   .dispay-wrapper .display-main-wrapper .display-screen-wrapper {
-    img {
-      width: 90%;
-    }
+    width: 90%;
   }
 }
 </style>

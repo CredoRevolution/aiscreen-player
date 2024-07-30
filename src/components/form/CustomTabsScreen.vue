@@ -1,22 +1,39 @@
 <template>
   <div
     class="main-screen__form-switch main-screen__form-item-warnings"
-    :class="{
-      error: this.showError,
-      widthAuto: tabs !== null && tabs !== undefined && tabs.length > 2,
-    }"
+    :class="{ error: this.showError }"
     @click="resetValidation"
   >
-    <div class="main-screen__form-switch-slider" ref="slider"></div>
-    <div
-      class="main-screen__form-switch-btn"
-      @click="makeActive"
-      v-for="tabs in tabs"
-      :key="tabs"
-      ref="tabs"
+    <div class="main-screen__form-switch-slider"></div>
+    <button
+      class="main-screen__form-switch-btn passive"
+      type="button"
+      @click.prevent="makeActive"
+      ref="passive"
     >
-      {{ tabs }}
-    </div>
+      0°
+    </button>
+    <button
+      class="main-screen__form-switch-btn"
+      type="button"
+      @click.prevent="makeActive"
+    >
+      90°
+    </button>
+    <button
+      class="main-screen__form-switch-btn"
+      type="button"
+      @click.prevent="makeActive"
+    >
+      180°
+    </button>
+    <button
+      class="main-screen__form-switch-btn"
+      type="button"
+      @click.prevent="makeActive"
+    >
+      270°
+    </button>
   </div>
 </template>
 
@@ -29,20 +46,15 @@ export default {
       type: String,
       required: false,
     },
-    tabs: {
-      type: Array,
-      required: true,
-    },
-    dataNeeded: {
-      type: Boolean,
+    definition: {
+      type: String,
       required: false,
-      default: false,
     },
   },
   data() {
     return {
       showError: false,
-      alreadyActive: false,
+      selected: '1-10',
     }
   },
   validations: {
@@ -56,16 +68,21 @@ export default {
         '.main-screen__form-switch-btn.active'
       )
       if (activeButtons.length > 0) {
+        this.getData()
         return true
       } else {
         this.showError = true
         return false
       }
     },
+    getData() {
+      this.$emit('getData', this.definition, this.selected)
+    },
     resetValidation() {
       this.$v.$reset()
       this.showError = false
     },
+
     makeActive(e) {
       const slider = this.$el?.querySelector('.main-screen__form-switch-slider')
       const buttons = this.$el?.querySelectorAll(
@@ -76,8 +93,7 @@ export default {
         button.classList.remove('passive')
       })
       e.target?.classList.add('active')
-      let activeTab = e.target
-      this.getDataTabs(activeTab)
+      this.selected = e.target?.textContent
 
       const sliderContainer = slider?.parentElement
       const activeButton = Array.from(buttons || []).find((button) =>
@@ -155,30 +171,12 @@ export default {
         slider.style.height = `${targetButtonHeight}px`
         slider.style.width = `${targetButtonWidth}px`
       }
-    },
-    getDataTabs(e) {
-      if (!this.dataNeeded) {
-        return
-      }
-      if (e) {
-        this.$emit('getDataTabs', e)
-      }
-    },
-    activateTabs() {
-      this.$nextTick(() => {
-        if (!this.alreadyActive) {
-          this.$refs.slider.style.transition = 'none'
-          this.$refs.tabs[0].click()
-          this.alreadyActive = true
-          setTimeout(() => {
-            this.$refs.slider.style.transition = 'all 0.3s ease'
-          }, 300)
-        }
-      })
+
+      this.getData()
     },
   },
   mounted() {
-    this.resetValidation()
+    this.$refs.passive.click()
   },
 }
 </script>
@@ -190,14 +188,15 @@ export default {
 
 .main-screen__form-switch {
   display: flex;
-  flex-direction: row;
-  padding: rem(3px);
+  flex-direction: column;
+  padding: rem(6px);
   border: 1px solid #86868b80;
   border-radius: rem(999px);
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   align-items: center;
-  justify-content: space-evenly;
+  justify-content: space-between;
   position: relative;
+  background-color: rgba(255, 255, 255, 1);
   &-slider {
     position: absolute;
     background: rgba(20, 20, 20, 1);
@@ -209,20 +208,18 @@ export default {
     border: 1px solid red;
   }
   .main-screen__form-switch-btn {
-    padding: rem(12px) rem(17px);
-    background: transparent;
+    padding: 0 !important;
+    width: rem(54px);
+    height: rem(54px);
+    background: transparent !important;
     border-radius: rem(999px);
     font-weight: 500;
     font-size: rem(17px);
     line-height: rem(21px);
     color: #86868b;
-    border: 1px solid transparent;
+    border: 1px solid transparent !important;
     transition: all 0.3s ease;
     position: relative;
-    width: 100%;
-    white-space: nowrap;
-    text-align: center;
-    cursor: pointer;
     //   &:not(:last-child):after {
     //     position: absolute;
     //     top: 15%;
@@ -233,7 +230,7 @@ export default {
     //     border-left: 1px solid #86868b80;
     //   }
     &.passive {
-      background: #f5f5f8;
+      background: #f5f5f8 !important;
       &::after {
         content: '';
         margin-left: 0;
@@ -245,8 +242,8 @@ export default {
       transition: all 0.5s ease;
       border-radius: rem(999px);
       color: #fff;
-      background: transparent;
-      border: 1px solid transparent;
+      background: transparent !important;
+      border: 1px solid transparent !important;
       &::after {
         content: '';
         margin-left: 0;
@@ -256,37 +253,33 @@ export default {
     }
   }
 }
-@media (max-width: 1050px) {
-  .main-screen__form-switch {
-    justify-content: space-between;
-    flex-wrap: nowrap;
-    .main-screen__form-switch-btn {
-      padding: rem(12px) rem(10px);
-    }
-  }
-}
-@media (max-width: 800px) {
-  .main-screen__form-switch {
-    .main-screen__form-switch-btn {
-      padding: rem(8px) rem(5px);
-    }
-  }
-}
+// @media (max-width: 1050px) {
+//   .main-screen__form-switch {
+//     justify-content: space-between;
+//     flex-wrap: nowrap;
+//     .main-screen__form-switch-btn {
+//       padding: rem(12px) rem(10px) !important;
+//     }
+//   }
+// }
+// @media (max-width: 800px) {
+//   .main-screen__form-switch {
+//     .main-screen__form-switch-btn {
+//       padding: rem(8px) rem(5px) !important;
+//     }
+//   }
+// }
+// @media (max-width: 768px) {
+//   .main-screen__form-switch {
+//     .main-screen__form-switch-btn {
+//       padding: rem(12px) rem(10px) !important;
+//     }
+//   }
+// }
 
-@media (max-width: 600px) {
-  .main-screen__form-switch {
-    // flex-wrap: wrap;
-  }
-  .main-screen__form-switch.widthAuto {
-    flex-wrap: wrap;
-    justify-content: space-around;
-    border-radius: rem(30px);
-    .main-screen__form-switch-slider {
-      border-radius: rem(30px);
-    }
-    .main-screen__form-switch-btn {
-      width: auto;
-    }
-  }
-}
+// @media (max-width: 420px) {
+//   .main-screen__form-switch-btn {
+//     padding: rem(10px) rem(7px) !important;
+//   }
+// }
 </style>
