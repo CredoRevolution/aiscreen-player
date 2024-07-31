@@ -12,7 +12,9 @@
     <div class="network-settings-wrapper" v-if="showSettings">
       <div class="network-settings-item">
         <div class="item-name">Network name</div>
-        <div class="item-value">aiscreenwifi</div>
+        <div class="item-value">
+          {{ this.formSettings.network.wifi.Network }}
+        </div>
       </div>
       <div class="network-settings-item">
         <div class="item-name">Last sync:</div>
@@ -32,11 +34,15 @@
       </div>
       <div class="network-settings-item">
         <div class="item-name">Network frequency</div>
-        <div class="item-value">2.4gHz</div>
+        <div class="item-value">
+          {{ this.formSettings.network.wifi.Frequency }}
+        </div>
       </div>
       <div class="network-settings-item">
         <div class="item-name">Hidden network</div>
-        <div class="item-value">True</div>
+        <div class="item-value">
+          {{ this.formSettings.network.wifi.hidden }}
+        </div>
       </div>
     </div>
   </div>
@@ -49,6 +55,15 @@ export default {
     return {
       showSettings: false,
     }
+  },
+  props: {
+    formSettings: {
+      type: Object,
+      required: true,
+    },
+  },
+  mounted() {
+    console.log(this.formSettings)
   },
 }
 </script>

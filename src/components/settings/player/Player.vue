@@ -33,11 +33,13 @@
       </ul>
     </div>
 
-    <playerCustomInput
+    <playerCustomInputLocationTime
       :placeholderText="'Germany, Frankfurt am Main'"
-      :defaultErrorText="'10:09am is required'"
+      :placeholderTextTime="'8:23pm'"
+      :defaultErrorText="'8:23pm is required'"
       :inputName="'place'"
       :time="true"
+      @getLocation="getLocation"
     />
     <tagsSearchSelect
       :optionsCount="tags"
@@ -48,35 +50,44 @@
       :defaultText="'Select tags'"
       @updateActiveTags="updateActiveTags"
     />
+    <button @click="transfer" class="player-settings__transfer">
+      Transfer to another space
+      <img src="@/assets/img/arrow-transfer.svg" alt="arrow" />
+    </button>
   </div>
 </template>
 
 <script>
 import playerCustomInput from '@/components/form/playerInputs/playerCustomInput.vue'
+import playerCustomInputLocationTime from '@/components/form/playerInputs/playerCustomInputLocationTime.vue'
 import tagsSearchSelect from '@/components/form/playerInputs/tagsSearchSelect.vue'
+
 export default {
   name: 'Player',
   components: {
     playerCustomInput,
     tagsSearchSelect,
+    playerCustomInputLocationTime,
   },
   data() {
     return {
       playerData: {
         wakeUpTime: '10:08am',
         activeDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+        location: 'Germany, Frankfurt am Main',
+        locationTime: '8:23pm',
         tags: [
           {
             name: 'tag2',
-            code: '2',
+            code: 'tag2',
           },
           {
             name: 'tag3',
-            code: '3',
+            code: 'tag3',
           },
           {
             name: 'tag4',
-            code: '4',
+            code: 'tag4',
           },
         ],
       },
@@ -92,7 +103,61 @@ export default {
       default: () => [],
     },
   },
+  computed: {
+    formattedDays() {
+      return this.formatDays(this.playerData.activeDays)
+    },
+  },
+  watch: {
+    playerData: {
+      handler() {
+        this.sendPlayerData()
+      },
+      deep: true,
+    },
+  },
   methods: {
+    transfer() {
+      // Transfer logic here
+    },
+    formatDays(days) {
+      const weekDays = [
+        'Sunday',
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+      ]
+
+      function getDayIndex(day) {
+        return weekDays.indexOf(day)
+      }
+
+      days.sort((a, b) => getDayIndex(a) - getDayIndex(b))
+
+      let result = []
+      let tempRange = []
+
+      for (let i = 0; i < days.length; i++) {
+        tempRange.push(days[i])
+
+        if (
+          i === days.length - 1 ||
+          getDayIndex(days[i + 1]) !== getDayIndex(days[i]) + 1
+        ) {
+          if (tempRange.length > 1) {
+            result.push(tempRange[0] + '-' + tempRange[tempRange.length - 1])
+          } else {
+            result.push(tempRange[0])
+          }
+          tempRange = []
+        }
+      }
+
+      return result.join(', ')
+    },
     updateActiveTags(tags) {
       this.playerData.tags = tags
     },
@@ -107,13 +172,21 @@ export default {
     getTime(time) {
       this.playerData.wakeUpTime = time
     },
-    sendPlayerData(playerData) {
-      console.log('Player data sent:', playerData)
-      this.$emit('sendPlayerData', playerData)
+    getLocation(location, time) {
+      this.playerData.location = location
+      this.playerData.locationTime = time
+    },
+    sendPlayerData() {
+      const playerDataWithFormattedDays = {
+        ...this.playerData,
+        formattedDays: this.formattedDays,
+      }
+      console.log('Player data sent:', playerDataWithFormattedDays)
+      this.$emit('sendPlayerData', playerDataWithFormattedDays)
     },
   },
   mounted() {
-    this.sendPlayerData(this.playerData)
+    this.sendPlayerData()
   },
 }
 </script>
@@ -126,30 +199,50 @@ export default {
   display: flex;
   flex-direction: column;
   gap: rem(17px);
-  .player-settings__time {
+  button {
+    all: unset;
+  }
+
+  .player-settings__transfer {
+    font-size: rem(19px);
+    line-height: rem(23px);
+    color: #0071e2;
+    font-weight: 700;
     display: flex;
-    flex-direction: column;
-    gap: rem(8px);
-    .player-settings__days-list {
-      list-style: none;
-      display: flex;
-      gap: rem(13px);
-      flex-direction: row;
-      align-items: center;
-      .player-settings__days-item {
-        cursor: pointer;
-        color: #14121f;
-        transition: all 0.2s ease;
-        padding: 0 rem(8px);
-        border-radius: rem(45px);
-        background-color: #f5f5f8;
-        font-size: rem(11px);
-        line-height: rem(20px);
-        font-weight: 400;
-        &--active {
-          background-color: #0071e2;
-          color: #f5f5f8;
-        }
+    align-items: center;
+    gap: rem(13px);
+    flex-direction: row;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    &:hover {
+      transition: all 0.2s ease;
+      opacity: 0.7;
+    }
+  }
+}
+.player-settings__time {
+  display: flex;
+  flex-direction: column;
+  gap: rem(8px);
+  .player-settings__days-list {
+    list-style: none;
+    display: flex;
+    gap: rem(13px);
+    flex-direction: row;
+    align-items: center;
+    .player-settings__days-item {
+      cursor: pointer;
+      color: #14121f;
+      transition: all 0.2s ease;
+      padding: 0 rem(8px);
+      border-radius: rem(45px);
+      background-color: #f5f5f8;
+      font-size: rem(11px);
+      line-height: rem(20px);
+      font-weight: 400;
+      &--active {
+        background-color: #0071e2;
+        color: #f5f5f8;
       }
     }
   }

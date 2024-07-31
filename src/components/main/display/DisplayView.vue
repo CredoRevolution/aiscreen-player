@@ -4,13 +4,28 @@
       <CustomTabsScreen @getData="rotateScreen" />
     </div>
     <div class="display-main-wrapper">
-      <ScreenSettings />
+      <ScreenSettings @rebootScreen="rebootScreen" />
       <div class="display-screen-wrapper" ref="screenWrapper">
         <img
+          v-if="screenStatus == 'ready'"
           src="@/assets/img/screen.png"
           alt="screen"
           class="display-screen"
           ref="screen"
+        />
+        <img
+          src="@/assets/img/loading.svg"
+          alt="loading"
+          class="display-screen display-screen_loading"
+          ref="loadingScreen"
+          v-if="screenStatus === 'loading'"
+        />
+        <img
+          src="@/assets/img/check.svg"
+          alt="loading"
+          class="display-screen display-screen_loading"
+          ref="loadingScreen"
+          v-if="screenStatus === 'ok'"
         />
       </div>
       <div class="display-scale-wrapper">
@@ -47,6 +62,11 @@ export default {
     ScreenSettings,
     CustomTabsScreen,
   },
+  data() {
+    return {
+      screenStatus: 'ready',
+    }
+  },
   methods: {
     changeScale() {
       this.$refs.scale.style.background = `linear-gradient(to right, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) ${this.$refs.scale.value}%, rgba(255, 255, 255, 1) ${this.$refs.scale.value}%)`
@@ -78,6 +98,19 @@ export default {
         this.$refs.screenWrapper.style.marginBottom =
           this.$refs.screenWrapper.offsetHeight / 2 + 'px'
       }
+    },
+    rebootScreen() {
+      let height = this.$refs.screenWrapper.offsetHeight
+      let width = this.$refs.screenWrapper.offsetWidth
+      this.$refs.screenWrapper.style.height = height + 'px'
+      this.$refs.screenWrapper.style.width = width + 'px'
+      this.screenStatus = 'loading'
+      setTimeout(() => {
+        this.screenStatus = 'ok'
+      }, 2000)
+      setTimeout(() => {
+        this.screenStatus = 'ready'
+      }, 3000)
     },
   },
   mounted() {
@@ -120,6 +153,9 @@ export default {
       overflow: hidden;
       img {
         width: 100%;
+      }
+      .display-screen_loading {
+        width: 50%;
       }
     }
     .display-scale-wrapper {

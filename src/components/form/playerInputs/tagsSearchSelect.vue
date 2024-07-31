@@ -19,6 +19,7 @@
         showValue: showValue,
         valid:
           !$v.value.$error && $v.value.$model && value?.name !== defaultText,
+        taggable: taggable,
       }"
       :closeOnSelect="!taggable"
       placeholder=""
@@ -32,7 +33,24 @@
       @close="checkLabel"
       @tag="addTag"
     >
+      <template #tag="{ option, remove }">
+        <span class="custom-tag">
+          {{ option.name }}
+          <span class="remove-tag" @click.stop="remove(option)"
+            ><img src="@/assets/img/closeTag.svg" alt="delete"
+          /></span>
+        </span>
+      </template>
     </multiselect>
+    <div class="additional-actions">
+      <div class="copy-tags" @click="copyActiveTags">
+        <img src="@/assets/img/copy.svg" alt="copy" />
+      </div>
+      <div class="clear-tags" @click="clearActiveTags">
+        <img src="@/assets/img/clear.svg" alt="clear" />
+      </div>
+    </div>
+
     <p v-if="showError && !$v.value.mustBeSelected" class="error-message">
       {{ defaultErrorText }}
     </p>
@@ -198,6 +216,24 @@ export default {
       this.optionsCount.push(tag)
       this.value.push(tag)
     },
+    copyActiveTags() {
+      const activeTags = this.value.filter(
+        (tag) => tag.name !== this.defaultText
+      )
+      const tagsToCopy = activeTags.map((tag) => tag.name).join(', ')
+      navigator.clipboard.writeText(tagsToCopy).then(() => {
+        console.log('Tags copied to clipboard')
+      })
+    },
+    clearActiveTags() {
+      this.value = []
+      this.$emit('updateActiveTags', this.value)
+    },
+    remove(tag) {
+      console.log('Removing', tag)
+      this.value = this.value.filter((t) => t.name !== tag.name)
+      this.$emit('updateActiveTags', this.value)
+    },
   },
 
   mounted() {
@@ -219,16 +255,68 @@ export default {
 @function rem($px) {
   @return ($px / 16px) + rem;
 }
+.select-wrapper_tags .multiselect__tags {
+  .multiselect__tags-wrap {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: rem(6px);
+    width: 85%;
+    overflow: hidden;
+    flex-wrap: wrap;
+    .custom-tag {
+      font-size: rem(11px);
+      line-height: rem(20px);
+      font-weight: 400;
+      padding: rem(4px) rem(6px);
+      background: #f5f5f8;
+      color: #14121f;
+      border-radius: rem(45px);
+      pointer-events: all;
+      position: relative;
+      z-index: 100;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: rem(4px);
+      .remove-tag {
+        padding: 0 rem(5px);
+        background: #e3e3e6;
+        border-radius: 50%;
+        height: rem(15px);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        img {
+          width: rem(6px);
+          height: rem(6px);
+          position: relative;
+        }
+      }
+    }
+  }
+}
+
 .select-wrapper_tags {
   position: relative;
   cursor: pointer;
+
+  .additional-actions {
+    position: absolute;
+    top: 35%;
+    right: rem(20px);
+    display: flex;
+    align-items: center;
+    gap: rem(6px);
+  }
   .multiselect__tags-wrap {
     position: absolute;
     transition: all 0.3s ease;
     font-size: rem(17px);
     line-height: rem(21px);
     font-weight: 500;
-    top: rem(17px);
+    top: rem(13px);
     left: rem(15px);
     color: #86868b;
     pointer-events: none;
@@ -239,7 +327,7 @@ export default {
   }
   &.active {
     .multiselect__tags-wrap {
-      top: rem(6px);
+      top: rem(3px);
       left: rem(15px);
       font-weight: 500;
       font-size: rem(13px);
@@ -470,6 +558,13 @@ export default {
       }
     }
   }
+}
+
+.select-wrapper_tags .multiselect.taggable .multiselect__select::before {
+  all: unset;
+}
+.select-wrapper_tags .multiselect.taggable::after {
+  all: unset;
 }
 
 // @media (max-height: 900px) {

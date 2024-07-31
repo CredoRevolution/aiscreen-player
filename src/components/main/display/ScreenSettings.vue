@@ -20,15 +20,15 @@
       />
     </div>
     <ul class="screen-settings-list">
-      <li class="screen-settings-item">
+      <li class="screen-settings-item" @click="rebootScreen">
         <img src="@/assets/img/update.svg" alt="" />
         Update software
       </li>
-      <li class="screen-settings-item">
+      <li class="screen-settings-item" @click="rebootScreen">
         <img src="@/assets/img/relaunch.svg" alt="" />
         Relaunch app
       </li>
-      <li class="screen-settings-item">
+      <li class="screen-settings-item" @click="rebootScreen">
         <img src="@/assets/img/reboot.svg" alt="" />
         Reboot hardware
       </li>
@@ -39,6 +39,11 @@
 <script>
 export default {
   name: 'ScreenSettings',
+  methods: {
+    rebootScreen() {
+      this.$emit('rebootScreen')
+    },
+  },
 }
 </script>
 

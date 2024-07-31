@@ -21,6 +21,33 @@
         />
         <SearchSelect
           v-show="selectedTab === 'Wi-Fi'"
+          :optionsCount="availableNetworks"
+          :defaultValue="{ name: 'Aiscreen' }"
+          :search="true"
+          :defaultText="'Available networks'"
+          :defaultErrorText="'Network is required'"
+          :form-place="['network', 'wifi']"
+          :formField="'Network'"
+          :required="selectedTab === 'Wi-Fi'"
+          @getData="getData"
+          ref="validation3"
+        />
+        <SearchSelect
+          class="search-select_mb"
+          v-show="selectedTab === 'Wi-Fi'"
+          :optionsCount="networkFrequencies"
+          :defaultValue="{ name: '2.4GHz' }"
+          :search="false"
+          :defaultText="'Network frequency'"
+          :defaultErrorText="'Frequency is required'"
+          :form-place="['network', 'wifi']"
+          :formField="'Frequency'"
+          :required="selectedTab === 'Wi-Fi'"
+          @getData="getData"
+          ref="validation3"
+        />
+        <SearchSelect
+          v-show="selectedTab === 'Wi-Fi'"
           :optionsCount="authentificationMethods"
           :search="false"
           :defaultText="'Authentification'"
@@ -296,6 +323,8 @@ export default {
             hidden: false,
             password: '',
             Authentification: '',
+            Frequency: '',
+            Network: '',
             enterprise: {
               mode: '',
               identity: '',
@@ -329,6 +358,25 @@ export default {
         ntp: [],
         trust_certificates: [],
       },
+      availableNetworks: [
+        {
+          name: 'Aiscreen',
+        },
+        {
+          name: 'Wifi1',
+        },
+        {
+          name: 'Wifi2',
+        },
+      ],
+      networkFrequencies: [
+        {
+          name: '2.4GHz',
+        },
+        {
+          name: '5GHz',
+        },
+      ],
       selectedTab: '',
       customTabs: ['Wi-Fi', 'Ethernet'],
       authentificationMethods: [
@@ -350,6 +398,7 @@ export default {
           name: 'PEAP',
         },
       ],
+
       timezone: [],
       guestedTimezone: '',
       readyJSON: {},
@@ -368,6 +417,12 @@ export default {
         console.log('activate')
       }
     },
+    form: {
+      handler() {
+        this.sendFormData()
+      },
+      deep: true,
+    },
   },
 
   methods: {
@@ -382,6 +437,7 @@ export default {
         } else {
           formObj[formField] = selectedValue.trim()
         }
+
         return
       }
       if (typeof selectedValue === 'boolean') {
@@ -390,10 +446,128 @@ export default {
         this.form[formField] = selectedValue.trim()
       }
     },
+    getAdvancedForm(form, selectedTab) {
+      if (selectedTab === null) {
+        return
+      }
+      if (
+        selectedTab &&
+        selectedTab.trim() == 'IP Address' &&
+        this.selectedTab == 'Ethernet'
+      ) {
+        this.form.network.ethernet.ipv4 = {
+          ...form.ipv4,
+        }
+      }
+      if (
+        selectedTab &&
+        selectedTab.trim() == 'IP Address' &&
+        this.selectedTab == 'Wi-Fi'
+      ) {
+        this.form.network.wifi.ipv4 = {
+          ...form.ipv4,
+        }
+      }
+      if (
+        selectedTab &&
+        selectedTab.trim() == 'DNS' &&
+        this.selectedTab == 'Wi-Fi'
+      ) {
+        this.form.network.wifi.dns = [...form.dns]
+      }
+      if (
+        selectedTab &&
+        selectedTab.trim() == 'DNS' &&
+        this.selectedTab == 'Ethernet'
+      ) {
+        this.form.network.ethernet.dns = [...form.dns]
+      }
+      if (selectedTab && selectedTab.trim() == 'Proxy') {
+        this.form.proxy = {
+          ...form.proxy,
+        }
+      }
+      if (selectedTab && selectedTab.trim() == 'NTP') {
+        this.form.ntp = [...form.ntp]
+      }
+      if (selectedTab && selectedTab.trim() == 'Trusted Site’s Certificates') {
+        this.form.trust_certificates = [...form.trust_certificates]
+      }
+    },
+    cleanForm() {
+      const cleanedForm = JSON.parse(
+        JSON.stringify(this.form, (key, value) =>
+          value == null ||
+          value === '' ||
+          (Array.isArray(value) &&
+            value.filter((item) => item !== null).length === 0) ||
+          (typeof value === 'object' &&
+            value !== null &&
+            Object.keys(value).length === 0)
+            ? undefined
+            : value
+        ),
+        (key, value) => {
+          if (
+            value === null ||
+            value === '' ||
+            key === 'Authentification' ||
+            value === 'Option' ||
+            (typeof value === 'object' && Object.keys(value).length === 0)
+          ) {
+            return undefined
+          } else if (key === 'mode') {
+            return value.toLowerCase()
+          } else if (this.selectedTab !== 'Wi-Fi' && key.startsWith('wifi')) {
+            return undefined
+          } else if (
+            this.form.network.wifi.Authentification !==
+              'Enterprise (WPA2 Enterprise)' &&
+            key === 'enterprise'
+          ) {
+            return undefined
+          } else if (
+            this.form.network.wifi.Authentification !==
+              'Basic (WPA2 Personal)' &&
+            key === 'password'
+          ) {
+            if (
+              this.form.network.wifi.Authentification ===
+                'Enterprise (WPA2 Enterprise)' &&
+              this.form.network.wifi.enterprise.mode === 'PEAP'
+            ) {
+              return value
+            }
+            return undefined
+          } else if (
+            this.form.network.wifi.enterprise.mode !== 'TLS' &&
+            (key === 'private_key' ||
+              key === 'private_key_password' ||
+              key === 'client_cert')
+          ) {
+            return undefined
+          } else if (this.selectedTab === 'Ethernet' && key === 'hidden') {
+            return undefined
+          } else {
+            if (Array.isArray(value)) {
+              return value.filter((item) => item !== null)
+            } else if (typeof value === 'string' && value.includes('(')) {
+              return value.replace(/ *\([^)]*\) */g, '').toLowerCase()
+            } else {
+              return value
+            }
+          }
+        }
+      )
+      return cleanedForm
+    },
     getDataTabs(tab) {
       if (tab) {
         this.selectedTab = tab.textContent.trim()
       }
+    },
+    sendFormData() {
+      this.$emit('sendFormData', this.form)
     },
   },
   mounted() {
@@ -406,6 +580,10 @@ export default {
 <style lang="scss" scoped>
 @function rem($px) {
   @return ($px / 16px) + rem;
+}
+
+.search-select_mb {
+  margin-bottom: rem(17px);
 }
 
 .error-message {

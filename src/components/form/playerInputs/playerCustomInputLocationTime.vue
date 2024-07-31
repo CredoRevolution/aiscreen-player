@@ -19,6 +19,15 @@
       @input="sendData"
       ref="input"
       v-model.trim="name"
+    />
+    <input
+      :name="inputName"
+      :class="['main-screen__form-input', 'main-screen__form-input_additional']"
+      :required="required"
+      :placeholder="placeholderTextTime"
+      @input="sendData"
+      ref="input"
+      v-model.trim="time"
       v-mask="'##:##AA'"
     />
     <div class="info-tooltip" v-if="info">
@@ -40,6 +49,10 @@ export default {
   name: 'CustomInput',
   props: {
     placeholderText: {
+      type: String,
+      required: true,
+    },
+    placeholderTextTime: {
       type: String,
       required: true,
     },
@@ -73,6 +86,7 @@ export default {
   data() {
     return {
       name: '',
+      time: '',
       isValid: false,
       showError: false,
       active: false,
@@ -129,7 +143,7 @@ export default {
       }
     },
     sendData() {
-      this.$emit('getTime', this.name)
+      this.$emit('getLocation', this.name, this.time)
     },
   },
 }
@@ -176,7 +190,7 @@ export default {
   }
 
   .main-screen__form-input {
-    background: #fff;
+    background: transparent;
     border-radius: rem(13px);
     padding: rem(15px) rem(15px) rem(15px) rem(15px);
     width: 100%;
@@ -185,6 +199,16 @@ export default {
     line-height: rem(21px);
     color: #14121f;
     border: 1px solid #86868b80;
+    &_additional {
+      z-index: 0;
+      position: absolute;
+      left: 100%;
+      transform: translateX(-100%);
+      width: 16.5%;
+      border: 1px solid transparent;
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
     &.error {
       border: 1px solid red;
     }

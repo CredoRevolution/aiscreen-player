@@ -13,6 +13,8 @@
         @toggleSettings="toggleSettings"
         @openSettings="toggleSettings"
         :playerSettings="playerSettings"
+        :formSettings="formSettings"
+        :playerId="playerId"
       />
     </div>
     <div class="main-wrapper_settings" v-show="settings == true">
@@ -20,6 +22,7 @@
         :tags="tags"
         :settings="settings"
         @sendPlayerData="setPlayerData"
+        @sendFormData="setFormData"
       />
     </div>
   </div>
@@ -51,6 +54,8 @@ export default {
       ],
 
       playerSettings: {},
+      formSettings: {},
+      playerId: '9bd1a6f7-49d4-4534-8e0d-19cd43553a91',
     }
   },
   methods: {
@@ -63,8 +68,11 @@ export default {
       }
     },
     setPlayerData(playerData) {
-      console.log(playerData)
       this.playerSettings = playerData
+    },
+    setFormData(formData) {
+      console.log('formData', formData)
+      this.formSettings = formData
     },
   },
 }

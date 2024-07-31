@@ -5,11 +5,12 @@
       <div class="chanel-main">
         <div class="chanel-status">Now playing</div>
         <div class="chanel-title">
-          Demo channel <img src="@/assets/img/chanel-more.svg" alt="" />
+          Demo channel
+          <!-- <img src="@/assets/img/chanel-more.svg" alt="" /> -->
         </div>
         <div class="chanel-id">
-          ID 9bd1a6f7-49d4-4534-8e0d-19cd43553a91
-          <img src="@/assets/img/copy.svg" alt="copy" />
+          ID {{ playerId }}
+          <img src="@/assets/img/copy.svg" alt="copy" @click="copyId" />
         </div>
         <ul class="chanel-tags">
           <li
@@ -83,7 +84,7 @@
             <div class="chanel-info-title">{{ playerSettings.wakeUpTime }}</div>
           </div>
           <div class="chanel-info-value">
-            {{ playerSettings.activeDays[0] }}
+            {{ playerSettings.formattedDays }}
           </div>
         </div>
         <div class="chanel-info-row-item">
@@ -135,15 +136,17 @@
         <div class="chanel-info-row-item">
           <div class="chanel-info-title-wrapper">
             <div class="chanel-info-title">Location</div>
-            <div class="chanel-info-title">8:23pm</div>
+            <div class="chanel-info-title">
+              {{ playerSettings.locationTime }}
+            </div>
           </div>
           <div class="chanel-info-value chanel-info-value__location">
-            Germany, Frankfurt am Main
+            {{ playerSettings.location }}
           </div>
         </div>
       </div>
     </div>
-    <NetworkSettings />
+    <NetworkSettings :formSettings="formSettings" />
   </div>
 </template>
 
@@ -180,6 +183,14 @@ export default {
       type: Object,
       required: true,
     },
+    formSettings: {
+      type: Object,
+      required: true,
+    },
+    playerId: {
+      type: String,
+      required: true,
+    },
   },
   methods: {
     toggleSettings() {
@@ -188,12 +199,11 @@ export default {
     openSettings() {
       this.$emit('toggleSettings')
     },
+    copyId() {
+      navigator.clipboard.writeText(this.playerId)
+    },
   },
-  mounted() {
-    setTimeout(() => {
-      console.log(this.playerSettings)
-    }, 2000)
-  },
+  mounted() {},
 }
 </script>
 
