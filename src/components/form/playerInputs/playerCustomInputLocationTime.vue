@@ -1,8 +1,16 @@
 <template>
-  <div :class="['input-wrapper']" ref="inputWrapper">
-    <!-- <label class="main-screen__form-item-label" for="text-input" ref="label">{{
+  <div
+    :class="[
+      'input-wrapper',
+      {
+        active,
+      },
+    ]"
+    ref="inputWrapper"
+  >
+    <label class="main-screen__form-item-label" for="text-input" ref="label">{{
       placeholderText
-    }}</label> -->
+    }}</label>
     <input
       :name="inputName"
       :class="[
@@ -64,6 +72,10 @@ export default {
       type: String,
       required: false,
     },
+    defaultName: {
+      type: String,
+      required: false,
+    },
     formPlace: {
       type: Array,
       required: false,
@@ -85,7 +97,7 @@ export default {
   },
   data() {
     return {
-      name: '',
+      name: this.defaultName ? this.defaultName : '',
       time: '',
       isValid: false,
       showError: false,
@@ -115,6 +127,8 @@ export default {
   },
   mounted() {
     this.resetValidation()
+    this.focus()
+    this.sendData()
   },
 
   methods: {
@@ -143,7 +157,15 @@ export default {
       }
     },
     sendData() {
-      this.$emit('getLocation', this.name, this.time)
+      this.checkValidation()
+      if (this.baseFile) {
+      }
+      if (this.formField) {
+        this.$emit('getData', this.formPlace, this.formField, this.name)
+
+        return
+      }
+      this.$emit('getData', this.placeholderText, this.name)
     },
   },
 }
@@ -192,7 +214,7 @@ export default {
   .main-screen__form-input {
     background: transparent;
     border-radius: rem(13px);
-    padding: rem(15px) rem(15px) rem(15px) rem(15px);
+    padding: rem(23px) rem(15px) rem(8px) rem(15px);
     width: 100%;
     font-weight: 500;
     font-size: rem(17px);
@@ -208,6 +230,7 @@ export default {
       border: 1px solid transparent;
       border-top-left-radius: 0;
       border-bottom-left-radius: 0;
+      padding: rem(15px) rem(15px) rem(15px) rem(15px);
     }
     &.error {
       border: 1px solid red;

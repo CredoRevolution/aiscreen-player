@@ -1,7 +1,13 @@
 <template>
   <div class="dispay-wrapper">
     <div class="tabs-wrapper">
-      <CustomTabsScreen @getData="rotateScreen" />
+      <CustomTabs
+        @getDataTabs="rotateScreen"
+        :dataNeeded="true"
+        :tabs="screenTabs"
+        :direction="'vertical'"
+        ref="rotateScreen"
+      />
     </div>
     <div class="display-main-wrapper">
       <ScreenSettings @rebootScreen="rebootScreen" />
@@ -55,16 +61,17 @@
 
 <script>
 import ScreenSettings from '@/components/main/display/ScreenSettings.vue'
-import CustomTabsScreen from '@/components/form/CustomTabsScreen.vue'
+import CustomTabs from '@/components/form/CustomTabs.vue'
 export default {
   name: 'DisplayView',
   components: {
     ScreenSettings,
-    CustomTabsScreen,
+    CustomTabs,
   },
   data() {
     return {
       screenStatus: 'ready',
+      screenTabs: ['0°', '90°', '180°', '270°'],
     }
   },
   methods: {
@@ -82,7 +89,7 @@ export default {
         this.$refs.scaleInput.value = 200
       }
     },
-    rotateScreen(something, value) {
+    rotateScreen(value) {
       const degrees = value.slice(0, -2)
       this.$refs.screenWrapper.style.transition = `all 0.3s ease`
       this.$refs.screen.style.transition = `all 0.3s ease`
@@ -90,9 +97,9 @@ export default {
       this.$refs.screenWrapper.style.margin = 0
       if (degrees == 90 || degrees == 270) {
         this.$refs.screenWrapper.style.width =
-          this.$refs.screen.offsetWidth + 'px'
+          this.$refs.screen.offsetWidth + 20 + 'px'
         this.$refs.screenWrapper.style.height =
-          this.$refs.screen.offsetHeight + 'px'
+          this.$refs.screen.offsetHeight + 20 + 'px'
         this.$refs.screenWrapper.style.marginTop =
           this.$refs.screenWrapper.offsetHeight / 2 + 'px'
         this.$refs.screenWrapper.style.marginBottom =
@@ -114,6 +121,7 @@ export default {
     },
   },
   mounted() {
+    this.$refs.rotateScreen.activateTabs()
     this.changeScale()
   },
 }
@@ -148,7 +156,7 @@ export default {
       align-items: center;
       transition: all 0.3s ease;
       border-radius: rem(14px);
-      border: rem(10px) solid black;
+      border: 10px solid black;
       border-radius: rem(24px);
       overflow: hidden;
       img {

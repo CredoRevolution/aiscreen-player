@@ -1,13 +1,16 @@
 <template>
   <div class="player-settings">
     <div class="player-settings__time">
-      <playerCustomInput
-        :placeholderText="'10:09am'"
+      <CustomInput
+        :placeholderText="'Auto wake up time'"
         :defaultErrorText="'10:09am is required'"
         :inputName="'time'"
         :info="true"
+        :timePicker="true"
+        :defaultName="'10:09am'"
+        :formField="'wakeUpTime'"
         v-model="playerData.wakeUpTime"
-        @getTime="getTime"
+        @getData="getData"
       />
       <ul class="player-settings__days-list">
         <li
@@ -34,12 +37,15 @@
     </div>
 
     <playerCustomInputLocationTime
-      :placeholderText="'Germany, Frankfurt am Main'"
+      :placeholderText="'Location'"
+      :defaultName="'Germany, Frankfurt am Mainnn'"
+      :formField="'location'"
       :placeholderTextTime="'8:23pm'"
       :defaultErrorText="'8:23pm is required'"
       :inputName="'place'"
       :time="true"
       @getLocation="getLocation"
+      @getData="getData"
     />
     <tagsSearchSelect
       :optionsCount="tags"
@@ -58,14 +64,18 @@
 </template>
 
 <script>
-import playerCustomInput from '@/components/form/playerInputs/playerCustomInput.vue'
+import CustomInput from '@/components/form/CustomInput.vue'
 import playerCustomInputLocationTime from '@/components/form/playerInputs/playerCustomInputLocationTime.vue'
 import tagsSearchSelect from '@/components/form/playerInputs/tagsSearchSelect.vue'
+import VueTimepicker from 'vue2-timepicker'
+
+// CSS
+import 'vue2-timepicker/dist/VueTimepicker.css'
 
 export default {
   name: 'Player',
   components: {
-    playerCustomInput,
+    CustomInput,
     tagsSearchSelect,
     playerCustomInputLocationTime,
   },
@@ -169,8 +179,8 @@ export default {
         this.playerData.activeDays.splice(index, 1)
       }
     },
-    getTime(time) {
-      this.playerData.wakeUpTime = time
+    getData(something, field, name) {
+      this.playerData[field] = name
     },
     getLocation(location, time) {
       this.playerData.location = location

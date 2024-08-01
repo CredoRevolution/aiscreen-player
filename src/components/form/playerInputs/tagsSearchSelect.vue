@@ -256,14 +256,19 @@ export default {
   @return ($px / 16px) + rem;
 }
 .select-wrapper_tags .multiselect__tags {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
   .multiselect__tags-wrap {
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: rem(6px);
-    width: 85%;
-    overflow: hidden;
+    width: auto;
+    max-width: 85%;
     flex-wrap: wrap;
+    position: unset;
+    margin-right: rem(6px);
     .custom-tag {
       font-size: rem(11px);
       line-height: rem(20px);
@@ -323,7 +328,8 @@ export default {
     z-index: 1;
   }
   .multiselect__tags {
-    height: rem(54px);
+    height: auto;
+    min-height: rem(54px);
   }
   &.active {
     .multiselect__tags-wrap {
@@ -427,7 +433,7 @@ export default {
       line-height: rem(21px);
       color: #86868b;
       border: 1px solid #86868b80;
-      padding: rem(23px) rem(15px) rem(8px) rem(15px);
+      padding: rem(12px) rem(15px) rem(12px) rem(15px);
       z-index: 0 !important;
       .multiselect__single {
         color: #86868b;
@@ -502,7 +508,7 @@ export default {
       line-height: rem(21px);
       color: #14121f;
       padding: 0;
-      margin: 0;
+      // margin: rem(5px) 0 0 0;
       border: 0;
       &::placeholder {
         color: #86868b;
@@ -520,6 +526,9 @@ export default {
         border: 1px solid #0071e2;
         box-shadow: 0px 0px 8px #0071e254;
         border-bottom: 1px solid #86868b80;
+        input {
+          width: auto !important;
+        }
       }
       .multiselect__select {
         &::before {

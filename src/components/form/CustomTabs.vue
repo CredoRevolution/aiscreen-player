@@ -4,6 +4,7 @@
     :class="{
       error: this.showError,
       widthAuto: tabs !== null && tabs !== undefined && tabs.length > 2,
+      vertical: direction === 'vertical',
     }"
     @click="resetValidation"
   >
@@ -33,10 +34,19 @@ export default {
       type: Array,
       required: true,
     },
+    direction: {
+      type: String,
+      required: false,
+      default: 'horizontal',
+    },
     dataNeeded: {
       type: Boolean,
       required: false,
       default: false,
+    },
+    definition: {
+      type: String,
+      required: false,
     },
   },
   data() {
@@ -160,6 +170,10 @@ export default {
       if (!this.dataNeeded) {
         return
       }
+      if (this.direction == 'vertical') {
+        this.$emit('getDataTabs', e?.textContent)
+        return
+      }
       if (e) {
         this.$emit('getDataTabs', e)
       }
@@ -198,6 +212,35 @@ export default {
   align-items: center;
   justify-content: space-evenly;
   position: relative;
+  &.vertical {
+    display: flex;
+    flex-direction: column;
+    padding: rem(6px);
+    border: 1px solid #86868b80;
+    border-radius: rem(999px);
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    background-color: rgba(255, 255, 255, 1);
+    .main-screen__form-switch-btn {
+      padding: 0 !important;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: rem(54px);
+      height: rem(54px);
+      background: transparent !important;
+      border-radius: rem(999px);
+      font-weight: 500;
+      font-size: rem(17px);
+      line-height: rem(21px);
+      color: #86868b;
+      border: 1px solid transparent !important;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+  }
   &-slider {
     position: absolute;
     background: rgba(20, 20, 20, 1);

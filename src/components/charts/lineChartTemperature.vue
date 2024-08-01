@@ -214,6 +214,9 @@ export default {
   @return ($px / 16px) + rem;
 }
 
+.chartjs-render-monitor {
+  height: rem(40px);
+}
 .chart-container {
   position: relative;
   width: 70%;

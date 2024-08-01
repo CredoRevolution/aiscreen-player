@@ -10,7 +10,11 @@
     </div>
     <div class="network-settings-wrapper">
       <div class="settings-title">Network</div>
-      <Network :settings="settings" @sendFormData="sendFormData" />
+      <Network
+        :settings="settings"
+        @sendFormData="sendFormData"
+        @saveSettings="saveSettings"
+      />
     </div>
   </div>
 </template>
@@ -46,6 +50,9 @@ export default {
     },
     sendFormData(formData) {
       this.$emit('sendFormData', formData)
+    },
+    saveSettings(formData) {
+      this.$emit('saveSettings', formData)
     },
   },
 }

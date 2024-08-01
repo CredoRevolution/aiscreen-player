@@ -10,7 +10,20 @@
         </div>
         <div class="chanel-id">
           ID {{ playerId }}
-          <img src="@/assets/img/copy.svg" alt="copy" @click="copyId" />
+          <img
+            src="@/assets/img/copy.svg"
+            alt="copy"
+            @click="copyId"
+            v-show="!idCopied"
+            ref="copy"
+          />
+          <img
+            src="@/assets/img/check.svg"
+            alt="copy"
+            @click="copyId"
+            v-show="idCopied"
+            ref="copied"
+          />
         </div>
         <ul class="chanel-tags">
           <li
@@ -107,12 +120,21 @@
       <div class="chanel-info-row chanel-info-row_graph">
         <div class="chanel-info-row-item chanel-info-row-item_graph">
           <div class="chanel-info-title">
-            CPU Temperature
-            <img src="@/assets/img/graph-arrow.svg" alt="arrow" />
+            <SearchSelect
+              :optionsCount="CPUoptions"
+              :defaultText="'CPU_Temperature'"
+              :defaultValue="{ name: 'CPU Temperature' }"
+              :compact="true"
+              :search="false"
+              :formField="'cpuChart'"
+              @getData="getData"
+            />
           </div>
           <div class="chanel-info-value-wrapper">
             <div class="graph-wrapper">
-              <LineChart />
+              <LineChartTemperature v-if="cpuChart === 'CPU Temperature'" />
+              <LineChartPercents v-if="cpuChart === 'CPU Usage'" />
+
               <!-- <div class="time">8:18pm</div> -->
             </div>
             <!-- 125°F -->
@@ -120,12 +142,20 @@
         </div>
         <div class="chanel-info-row-item chanel-info-row-item_graph">
           <div class="chanel-info-title">
-            GPU Temperature
-            <img src="@/assets/img/graph-arrow.svg" alt="arrow" />
+            <SearchSelect
+              :optionsCount="GPUoptions"
+              :defaultText="'GPU_Temperature'"
+              :defaultValue="{ name: 'GPU Temperature' }"
+              :compact="true"
+              :search="false"
+              :formField="'gpuChart'"
+              @getData="getData"
+            />
           </div>
           <div class="chanel-info-value-wrapper">
             <div class="graph-wrapper">
-              <LineChart />
+              <LineChartTemperature v-if="gpuChart === 'GPU Temperature'" />
+              <LineChartPercents v-if="gpuChart === 'GPU Usage'" />
               <!-- <div class="time">8:20pm</div> -->
             </div>
             <!-- 135°F -->
@@ -152,18 +182,41 @@
 
 <script>
 import NetworkSettings from '@/components/main/settings/NetworkSettings.vue'
-import LineChart from '@/components/charts/lineChart.vue'
+import SearchSelect from '@/components/form/SearchSelect.vue'
+import LineChartTemperature from '@/components/charts/lineChartTemperature.vue'
+import LineChartPercents from '@/components/charts/lineChartPercents.vue'
 import moment from 'moment'
 
 export default {
   name: 'SettingsView',
   components: {
     NetworkSettings,
-    LineChart,
+    LineChartTemperature,
+    LineChartPercents,
+    SearchSelect,
   },
   data() {
     return {
       startTime: 'Jul 14, 2024, 9:20pm',
+      idCopied: false,
+      CPUoptions: [
+        {
+          name: 'CPU Temperature',
+        },
+        {
+          name: 'CPU Usage',
+        },
+      ],
+      GPUoptions: [
+        {
+          name: 'GPU Temperature',
+        },
+        {
+          name: 'GPU Usage',
+        },
+      ],
+      cpuChart: '',
+      gpuChart: '',
     }
   },
   computed: {
@@ -201,6 +254,29 @@ export default {
     },
     copyId() {
       navigator.clipboard.writeText(this.playerId)
+      this.$refs.copy.style.transition = 'opacity 0.2s ease-in-out'
+      this.$refs.copied.style.transition = 'opacity 0.2s ease-in-out'
+      setTimeout(() => {
+        this.$refs.copied.style.opacity = '1'
+        this.idCopied = true
+      }, 200)
+      this.$refs.copy.style.opacity = '0'
+      setTimeout(() => {
+        this.$refs.copied.style.opacity = '0'
+      }, 2000)
+      setTimeout(() => {
+        this.idCopied = false
+      }, 2200)
+      setTimeout(() => {
+        this.$refs.copy.style.opacity = '1'
+      }, 2400)
+      setTimeout(() => {
+        this.$refs.copy.style.transition = 'none'
+        this.$refs.copied.style.transition = 'none'
+      }, 4000)
+    },
+    getData(place, field, value) {
+      this[field] = value
     },
   },
   mounted() {},

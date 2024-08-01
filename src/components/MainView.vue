@@ -23,6 +23,7 @@
         :settings="settings"
         @sendPlayerData="setPlayerData"
         @sendFormData="setFormData"
+        @saveSettings="saveSettings"
       />
     </div>
   </div>
@@ -74,6 +75,11 @@ export default {
       console.log('formData', formData)
       this.formSettings = formData
     },
+    saveSettings(formData) {
+      this.formSettings = formData
+      this.settings = false
+      console.log('saved settings', this.formSettings)
+    },
   },
 }
 </script>
@@ -81,6 +87,34 @@ export default {
 <style lang="scss" scoped>
 @function rem($px) {
   @return ($px / 16px) + rem;
+}
+::v-deep {
+  .error-message {
+    color: #d42b2b;
+    font-size: rem(13px);
+    line-height: rem(16px);
+    margin-top: rem(5px);
+    position: relative;
+    margin-left: rem(18px);
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    &::before {
+      position: absolute;
+      content: url('@/assets/img/warning.svg');
+      font-size: rem(15px);
+      line-height: rem(18px);
+      font-weight: 500;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      left: rem(-18px);
+      color: #d42b2b;
+      bottom: -10%;
+      display: flex;
+      align-items: center;
+    }
+  }
 }
 #main {
   width: 100%;

@@ -3,7 +3,7 @@
     @click="resetValidation"
     :class="['select-wrapper', active ? 'active' : '']"
   >
-    <label class="main-screen__form-label" for="select">
+    <label class="main-screen__form-label" for="select" v-if="!compact">
       {{ defaultText }}</label
     >
     <multiselect
@@ -17,6 +17,7 @@
         showValue: showValue,
         valid:
           !$v.value.$error && $v.value.$model && value?.name !== defaultText,
+        compact: compact,
       }"
       placeholder=""
       label="name"
@@ -54,8 +55,10 @@ export default {
     }
   },
   props: {
-    optionsCount: {},
-
+    optionsCount: {
+      type: Array,
+      required: true,
+    },
     defaultText: {
       type: String,
       required: true,
@@ -87,6 +90,11 @@ export default {
       required: false,
     },
     required: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    compact: {
       type: Boolean,
       required: false,
       default: false,
@@ -444,6 +452,57 @@ export default {
           }
         }
       }
+    }
+  }
+}
+
+.select-wrapper {
+  .multiselect.compact {
+    .multiselect__select {
+      &::before {
+        width: rem(8px);
+        height: rem(6px);
+        top: rem(8px);
+      }
+    }
+    &::after {
+      content: none;
+    }
+    .multiselect__content-wrapper {
+      border: 1px solid #86868b80;
+      border-bottom: 0;
+      .multiselect__option--selected::after {
+        content: none;
+      }
+      .multiselect__option {
+        font-size: rem(14px) !important;
+        line-height: rem(21px) !important;
+        font-weight: 500 !important;
+        color: #86868b !important;
+        padding: rem(5px) rem(5px) rem(5px) rem(5px);
+        &--highlight.multiselect__option--selected::after {
+          content: none;
+        }
+      }
+    }
+    .multiselect__tags {
+      font-size: rem(14px) !important;
+      line-height: rem(21px) !important;
+      font-weight: 500 !important;
+      color: #86868b !important;
+      border: 1px solid transparent;
+      padding: rem(0px) rem(25px) rem(0px) rem(5px);
+      .multiselect__single {
+        font-size: rem(14px) !important;
+        line-height: rem(21px) !important;
+        font-weight: 500 !important;
+        color: #86868b !important;
+      }
+    }
+  }
+  .multiselect.multiselect--active.compact {
+    .multiselect__tags {
+      border: 1px solid #86868b80;
     }
   }
 }

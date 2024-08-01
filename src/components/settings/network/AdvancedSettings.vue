@@ -189,8 +189,27 @@ export default {
         this.selectedTab = tab.textContent.trim()
       }
     },
-    getData() {
-      console.log(this.selectedTab)
+    getData(formPlace, formField, selectedValue) {
+      if (formPlace) {
+        let formObj = this.form
+        for (let i = 0; i < formPlace.length; i++) {
+          formObj = formObj[formPlace[i]]
+        }
+        if (selectedValue === null) {
+          delete formObj[formField]
+        } else {
+          formObj[formField] = selectedValue.trim()
+        }
+
+        this.$emit('sendAdvancedForm', this.form, this.selectedTab)
+        return
+      }
+      if (selectedValue === null) {
+        delete this.form[formField]
+      } else {
+        this.form[formField] = selectedValue.trim()
+      }
+      this.$emit('sendAdvancedForm', this.form, this.selectedTab)
     },
     checkAllValidations() {
       this.validationCount = 0

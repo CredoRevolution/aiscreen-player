@@ -38,6 +38,9 @@
       @input="sendData"
       ref="input"
     />
+    <div class="info-tooltip" v-if="info">
+      <!-- <img src="@/assets/img/info.svg" alt=""> -->
+    </div>
     <div class="deletable" @click="deleteThisInput" v-if="deletable">
       <img :src="require('@/assets/img/cross.svg')" alt="delete" />
     </div>
@@ -92,6 +95,10 @@ export default {
       type: String,
       required: true,
     },
+    defaultName: {
+      type: String,
+      required: false,
+    },
     phone: {
       type: Boolean,
       required: false,
@@ -137,10 +144,15 @@ export default {
       required: false,
       default: false,
     },
+    info: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
-      name: '',
+      name: this.defaultName ? this.defaultName : '',
       isValid: false,
       showError: false,
       active: false,
@@ -178,6 +190,8 @@ export default {
   },
   mounted() {
     this.resetValidation()
+    this.focus()
+    this.sendData()
   },
 
   methods: {
@@ -279,6 +293,16 @@ export default {
     left: rem(15px);
     color: #86868b;
     pointer-events: none;
+  }
+  .info-tooltip {
+    position: absolute;
+    top: rem(19px);
+    right: rem(17px);
+    cursor: pointer;
+    width: rem(15px);
+    height: rem(15px);
+    background: url('@/assets/img/info.svg') no-repeat;
+    background-size: cover;
   }
   input[type='password'] {
     &::-ms-reveal {

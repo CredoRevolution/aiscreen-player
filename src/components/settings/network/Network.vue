@@ -291,7 +291,11 @@
         @getData="getData"
         ref="customCheckbox"
       />
-      <AdvancedSettings ref="advancedSettings" />
+      <AdvancedSettings
+        ref="advancedSettings"
+        @sendAdvancedForm="getAdvancedForm"
+      />
+      <button type="button" class="main-btn" @click="saveSettings">Save</button>
     </form>
   </div>
 </template>
@@ -426,6 +430,54 @@ export default {
   },
 
   methods: {
+    getAdvancedForm(form, selectedTab) {
+      if (selectedTab === null) {
+        return
+      }
+      if (
+        selectedTab &&
+        selectedTab.trim() == 'IP Address' &&
+        this.selectedTab == 'Ethernet'
+      ) {
+        this.form.network.ethernet.ipv4 = {
+          ...form.ipv4,
+        }
+      }
+      if (
+        selectedTab &&
+        selectedTab.trim() == 'IP Address' &&
+        this.selectedTab == 'Wi-Fi'
+      ) {
+        this.form.network.wifi.ipv4 = {
+          ...form.ipv4,
+        }
+      }
+      if (
+        selectedTab &&
+        selectedTab.trim() == 'DNS' &&
+        this.selectedTab == 'Wi-Fi'
+      ) {
+        this.form.network.wifi.dns = [...form.dns]
+      }
+      if (
+        selectedTab &&
+        selectedTab.trim() == 'DNS' &&
+        this.selectedTab == 'Ethernet'
+      ) {
+        this.form.network.ethernet.dns = [...form.dns]
+      }
+      if (selectedTab && selectedTab.trim() == 'Proxy') {
+        this.form.proxy = {
+          ...form.proxy,
+        }
+      }
+      if (selectedTab && selectedTab.trim() == 'NTP') {
+        this.form.ntp = [...form.ntp]
+      }
+      if (selectedTab && selectedTab.trim() == 'Trusted Site’s Certificates') {
+        this.form.trust_certificates = [...form.trust_certificates]
+      }
+    },
     getData(formPlace, formField, selectedValue) {
       if (formPlace) {
         let formObj = this.form
@@ -568,6 +620,9 @@ export default {
     },
     sendFormData() {
       this.$emit('sendFormData', this.form)
+    },
+    saveSettings() {
+      this.$emit('saveSettings', this.form)
     },
   },
   mounted() {
