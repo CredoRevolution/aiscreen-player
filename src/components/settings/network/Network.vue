@@ -12,6 +12,7 @@
           v-show="selectedTab === 'Wi-Fi'"
           :placeholderText="'Network name (SSID)'"
           :defaultErrorText="'Network name (SSID) is required'"
+          :defaultName="'AIscreen something'"
           :formField="'ssid'"
           :formPlace="['network', 'wifi']"
           :inputName="'ssid'"
@@ -52,6 +53,9 @@
           :search="false"
           :defaultText="'Authentification'"
           :defaultErrorText="'Authentification is required'"
+          :defaultValue="{
+            name: 'None',
+          }"
           :form-place="['network', 'wifi']"
           :formField="'Authentification'"
           :required="selectedTab === 'Wi-Fi'"
@@ -283,14 +287,22 @@
         @getData="getData"
         ref="validation14"
       />
-      <CustomCheckbox
-        v-show="selectedTab === 'Wi-Fi'"
-        :placeholderText="'Hidden network'"
-        :formField="'hidden'"
-        :formPlace="['network', 'wifi']"
-        @getData="getData"
-        ref="customCheckbox"
-      />
+      <div class="toggle-wrapper">
+        <p class="toggle-text">Hidden network</p>
+        <toggle-button
+          v-model="form.network.wifi.hidden"
+          :color="{
+            checked: 'rgba(0, 113, 226, 1)',
+            unchecked: 'rgba(134, 134, 139, 0.5)',
+          }"
+          :value="true"
+          :margin="8"
+          :width="56"
+          :height="32"
+          :font-size="12"
+          @change="getToggleData"
+        />
+      </div>
       <AdvancedSettings
         ref="advancedSettings"
         @sendAdvancedForm="getAdvancedForm"
@@ -304,7 +316,6 @@
 import CustomInput from '@/components/form/CustomInput.vue'
 import CustomTabs from '@/components/form/CustomTabs.vue'
 import SearchSelect from '@/components/form/SearchSelect.vue'
-import CustomCheckbox from '@/components/form/CustomCheckbox.vue'
 import AdvancedSettings from '@/components/settings/network/AdvancedSettings.vue'
 import moment from 'moment-timezone'
 
@@ -315,7 +326,6 @@ export default {
     CustomTabs,
     SearchSelect,
     AdvancedSettings,
-    CustomCheckbox,
   },
   data() {
     return {
@@ -479,6 +489,7 @@ export default {
       }
     },
     getData(formPlace, formField, selectedValue) {
+      console.log(formPlace, formField, selectedValue)
       if (formPlace) {
         let formObj = this.form
         for (let i = 0; i < formPlace.length; i++) {
@@ -613,12 +624,16 @@ export default {
       )
       return cleanedForm
     },
+    getToggleData(data) {
+      this.form.network.wifi.hidden = data.value
+    },
     getDataTabs(tab) {
       if (tab) {
         this.selectedTab = tab.textContent.trim()
       }
     },
     sendFormData() {
+      console.log(this.form)
       this.$emit('sendFormData', this.form)
     },
     saveSettings() {
@@ -628,6 +643,7 @@ export default {
   mounted() {
     this.guestedTimezone = moment.tz.guess()
     this.timezone = moment.tz.names().map((name) => ({ name }))
+    this.sendFormData()
   },
 }
 </script>
@@ -635,6 +651,22 @@ export default {
 <style lang="scss" scoped>
 @function rem($px) {
   @return ($px / 16px) + rem;
+}
+
+.toggle-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: rem(17px);
+
+  .toggle-text {
+    font-size: rem(24px);
+    line-height: rem(29px);
+    font-weight: 700;
+    color: #14121f;
+  }
 }
 
 .search-select_mb {

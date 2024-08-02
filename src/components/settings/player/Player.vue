@@ -39,6 +39,7 @@
     <playerCustomInputLocationTime
       :placeholderText="'Location'"
       :defaultName="'Germany, Frankfurt am Mainnn'"
+      :defaultNameTime="{ hh: '03', mm: '05', a: 'am' }"
       :formField="'location'"
       :placeholderTextTime="'8:23pm'"
       :defaultErrorText="'8:23pm is required'"
@@ -66,7 +67,7 @@
 <script>
 import CustomInput from '@/components/form/CustomInput.vue'
 import playerCustomInputLocationTime from '@/components/form/playerInputs/playerCustomInputLocationTime.vue'
-import tagsSearchSelect from '@/components/form/playerInputs/tagsSearchSelect.vue'
+import tagsSearchSelect from '@/components/form/tagsSearchSelect.vue'
 import VueTimepicker from 'vue2-timepicker'
 
 // CSS
@@ -184,7 +185,7 @@ export default {
     },
     getLocation(location, time) {
       this.playerData.location = location
-      this.playerData.locationTime = time
+      this.playerData.locationTime = time.hh + ':' + time.mm + `${time.a}`
     },
     sendPlayerData() {
       const playerDataWithFormattedDays = {

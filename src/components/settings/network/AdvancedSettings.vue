@@ -34,7 +34,7 @@
           :formPlace="['ipv4']"
           :input-name="'IP'"
           :form-field="'address'"
-          :ipAddress="true"
+          :mask="'###-###-###-###/##'"
           @getData="getData"
           ref="validation2"
         />

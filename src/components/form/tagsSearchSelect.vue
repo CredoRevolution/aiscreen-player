@@ -314,6 +314,15 @@ export default {
     display: flex;
     align-items: center;
     gap: rem(6px);
+    div {
+      transition: all 0.2s ease;
+
+      &:hover {
+        cursor: pointer;
+        filter: brightness(0);
+        transition: all 0.2s ease;
+      }
+    }
   }
   .multiselect__tags-wrap {
     position: absolute;

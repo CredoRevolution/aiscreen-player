@@ -1,15 +1,9 @@
 <template>
-  <!-- Основной контейнер для графика и информации о температуре -->
   <div :style="styles" :class="['chart-container', cssClasses]">
-    <!-- Элемент canvas для отрисовки графика -->
     <canvas ref="canvas" :height="height" :width="width"></canvas>
-
-    <!-- Информация о текущей температуре -->
     <div class="current-temperature">
       <div>{{ currentTemperature }}°F</div>
     </div>
-
-    <!-- Информация о текущем времени -->
     <div class="current-time" v-if="currentTime">
       <div>{{ currentTime }}</div>
     </div>
@@ -17,47 +11,77 @@
 </template>
 
 <script>
-// Импортируем компоненты и библиотеки
-import { Line } from 'vue-chartjs' // Импорт компонента Line из vue-chartjs
-import Chart from 'chart.js' // Импорт библиотеки Chart.js
+import { Line } from 'vue-chartjs'
+import Chart from 'chart.js'
+
+Chart.plugins.register({
+  afterEvent: function (chart, event) {
+    if (event.type === 'mousemove') {
+      const chartArea = chart.chartArea
+      const y = event.y
+      if (y >= chartArea.top && y <= chartArea.bottom) {
+        const x = event.x
+        let closestPoint
+        let minDistance = Number.MAX_VALUE
+
+        chart.data.datasets[0].data.forEach((dataPoint, index) => {
+          const xPos = chart.scales['x-axis-0'].getPixelForValue(
+            chart.data.labels[index]
+          )
+          const distance = Math.abs(xPos - x)
+          if (distance < minDistance) {
+            minDistance = distance
+            closestPoint = index
+          }
+        })
+
+        if (closestPoint !== undefined) {
+          const datasetIndex = 0 // Assuming only one dataset
+          const data = chart.data.datasets[datasetIndex].data[closestPoint]
+          const label = chart.data.labels[closestPoint]
+
+          // Update current temperature and time
+          chart.$vue._data.currentTemperature = data
+          chart.$vue._data.currentTime = label.toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit',
+          })
+        }
+      }
+    }
+  },
+})
 
 export default {
-  name: 'LineChart', // Имя компонента
+  name: 'LineChart',
 
-  extends: Line, // Расширение компонента Line из vue-chartjs
+  extends: Line,
 
   props: {
-    // ID графика, по умолчанию 'line-chart'
     chartId: {
       type: String,
       default: 'line-chart',
     },
-    // Ключ для идентификации данных в наборе данных, по умолчанию 'label'
     datasetIdKey: {
       type: String,
       default: 'label',
     },
-    // CSS-классы для стилизации компонента
     cssClasses: {
       type: String,
       default: '',
     },
-    // Высота графика, по умолчанию '50px'
     height: {
       type: String,
       default: '50px',
     },
-    // Ширина графика, по умолчанию '75px'
     width: {
       type: String,
       default: '75px',
     },
-    // Стили для контейнера графика
     styles: {
       type: Object,
       default: () => ({}),
     },
-    // Плагины для Chart.js, по умолчанию пустой массив
     plugins: {
       type: Array,
       default: () => [],
@@ -66,144 +90,120 @@ export default {
 
   data() {
     return {
-      // Данные графика
       chartData: {
-        labels: [], // Метки на оси X
+        labels: [],
         datasets: [
           {
-            label: 'CPU Temperature', // Название набора данных
-            data: [], // Данные для графика
-            fill: false, // Не заполнять область под графиком
-            borderColor: '#0071E2', // Цвет границы линии графика
-            backgroundColor: '#0071E2', // Цвет фона линии графика
-            pointBorderColor: '#0071E2', // Цвет границы точки
-            pointBackgroundColor: '#FFF', // Цвет заливки точки
-            borderWidth: 2, // Ширина границы линии
-            pointRadius: 0, // Радиус точки
-            pointHoverRadius: 6, // Радиус точки при наведении
+            label: 'CPU Temperature',
+            data: [],
+            fill: false,
+            borderColor: '#0071E2',
+            backgroundColor: '#0071E2',
+            pointBorderColor: '#0071E2',
+            pointBackgroundColor: '#FFF',
+            hoverBackgroundColor: '#FFF',
+            borderWidth: 2,
+            pointRadius: 0,
+            pointHoverRadius: 6,
           },
         ],
       },
 
-      // Опции для графика
       chartOptions: {
-        responsive: true, // График будет адаптироваться к размерам контейнера
-        maintainAspectRatio: false, // График не будет сохранять соотношение сторон
+        responsive: true,
+        maintainAspectRatio: false,
         legend: {
-          display: false, // Не отображать легенду
+          display: false,
         },
         scales: {
           xAxes: [
             {
-              type: 'time', // Ось X будет отображать время
+              type: 'time',
               time: {
                 displayFormats: {
-                  minute: 'h:mm a', // Формат отображения времени
+                  minute: 'h:mm a',
                 },
-                tooltipFormat: 'h:mm a', // Формат времени в тултипе
-                unit: 'minute', // Единица времени
+                tooltipFormat: 'h:mm a',
+                unit: 'minute',
               },
               gridLines: {
-                display: false, // Не отображать линии сетки на оси X
+                display: false,
               },
               ticks: {
-                display: false, // Не отображать деления на оси X
+                display: false,
               },
             },
           ],
           yAxes: [
             {
               ticks: {
-                display: false, // Не отображать деления на оси Y
-                beginAtZero: true, // Начинать отсчет с нуля
+                display: false,
+                beginAtZero: true,
               },
               gridLines: {
-                display: false, // Не отображать линии сетки на оси Y
+                display: false,
               },
             },
           ],
         },
         tooltips: {
-          enabled: false, // Отключить тултипы
+          enabled: false, // Отключаем тултипы
         },
         hover: {
           mode: 'nearest',
-          intersect: true,
-          onHover: this.handleHover,
+          intersect: false,
         },
       },
 
-      // Переменные состояния графика
       chart: null,
-      currentTemperature: 0, // Текущая температура
-      currentTime: '', // Текущее время
-      maxPoints: 100, // Максимальное количество точек на графике
+      currentTemperature: 0,
+      currentTime: '',
+      maxPoints: 100,
     }
   },
 
   mounted() {
-    // Создаем график после монтирования компонента
     this.createChart()
-    // Запускаем получение данных о температуре
     this.fetchCpuTemperature()
   },
 
   methods: {
-    // Метод для создания графика
     createChart() {
-      const ctx = this.$refs.canvas.getContext('2d') // Получаем контекст канваса
+      const ctx = this.$refs.canvas.getContext('2d')
       this.chart = new Chart(ctx, {
-        type: 'line', // Тип графика
-        data: this.chartData, // Данные для графика
-        options: this.chartOptions, // Опции для графика
+        type: 'line',
+        data: this.chartData,
+        options: this.chartOptions,
       })
+      this.chart.$vue = this
     },
 
-    // Метод для эмуляции получения данных о температуре
     fetchCpuTemperature() {
       setInterval(() => {
-        const newTemperature = Math.floor(Math.random() * 100) // Генерируем случайную температуру
-        const currentTime = new Date() // Получаем текущее время
+        const newTemperature = Math.floor(Math.random() * 100)
+        const currentTime = new Date()
         const timeString = currentTime.toLocaleTimeString([], {
           hour: '2-digit',
           minute: '2-digit',
-        }) // Форматируем время
+        })
 
-        // Добавляем новые данные в график
         this.chartData.labels.push(currentTime)
         this.chartData.datasets[0].data.push(newTemperature)
         this.currentTemperature = newTemperature
         this.currentTime = timeString
 
-        // Удаляем старые данные, если их больше 10
         if (this.chartData.labels.length > 10) {
           this.chartData.labels.shift()
           this.chartData.datasets[0].data.shift()
         }
-        // Удаляем старые данные, если их больше maxPoints
+
         if (this.chartData.labels.length > this.maxPoints) {
           this.chartData.labels.shift()
           this.chartData.datasets[0].data.shift()
         }
 
-        // Обновляем график
         this.chart.update()
-      }, 5000) // Интервал обновления данных 2 секунды
-    },
-
-    // Метод для обработки наведения на точку
-    handleHover(event, activeElements) {
-      if (activeElements.length > 0) {
-        const pointIndex = activeElements[0]._index
-        const datasetIndex = activeElements[0]._datasetIndex
-        const data = this.chart.data.datasets[datasetIndex].data[pointIndex]
-        const label = this.chart.data.labels[pointIndex]
-        this.currentTemperature = data
-        this.currentTime = label.toLocaleTimeString([], {
-          hour: '2-digit',
-          minute: '2-digit',
-        })
-      }
+      }, 5000)
     },
   },
 }

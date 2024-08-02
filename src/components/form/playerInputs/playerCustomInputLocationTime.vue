@@ -28,7 +28,19 @@
       ref="input"
       v-model.trim="name"
     />
-    <input
+    <vue-timepicker
+      :class="[
+        'main-screen__form-input',
+        'main-screen__form-input_additional',
+        active,
+      ]"
+      format="hh:mm a"
+      v-model="nameTime"
+      close-on-complete
+      hide-clear-button
+      @change="sendData"
+    ></vue-timepicker>
+    <!-- <input
       :name="inputName"
       :class="['main-screen__form-input', 'main-screen__form-input_additional']"
       :required="required"
@@ -37,8 +49,9 @@
       ref="input"
       v-model.trim="time"
       v-mask="'##:##AA'"
-    />
-    <div class="info-tooltip" v-if="info">
+    /> -->
+
+    <div class="info-tooltip">
       <!-- <img src="@/assets/img/info.svg" alt=""> -->
     </div>
     <div class="error-message" v-if="showError && !$v.name.minLength">
@@ -52,9 +65,16 @@
 
 <script>
 import { required, minLength } from 'vuelidate/lib/validators'
+import VueTimepicker from 'vue2-timepicker'
+
+// CSS
+import 'vue2-timepicker/dist/VueTimepicker.css'
 
 export default {
   name: 'CustomInput',
+  components: {
+    VueTimepicker,
+  },
   props: {
     placeholderText: {
       type: String,
@@ -74,6 +94,10 @@ export default {
     },
     defaultName: {
       type: String,
+      required: false,
+    },
+    defaultNameTime: {
+      type: Object,
       required: false,
     },
     formPlace: {
@@ -98,6 +122,7 @@ export default {
   data() {
     return {
       name: this.defaultName ? this.defaultName : '',
+      nameTime: this.defaultNameTime ? this.defaultNameTime : '',
       time: '',
       isValid: false,
       showError: false,
@@ -158,9 +183,11 @@ export default {
     },
     sendData() {
       this.checkValidation()
-      if (this.baseFile) {
+      if (this.nameTime) {
+        this.$emit('getLocation', this.name, this.nameTime)
       }
       if (this.formField) {
+        console.log(this.formField, this.name, this.nameTime)
         this.$emit('getData', this.formPlace, this.formField, this.name)
 
         return
@@ -189,14 +216,21 @@ export default {
     color: #86868b;
     pointer-events: none;
   }
+  &:hover {
+    .info-tooltip {
+      transition: all 0.2s ease;
+      opacity: 0.7;
+    }
+  }
   .info-tooltip {
+    opacity: 0;
     position: absolute;
     top: rem(19px);
     right: rem(17px);
-    cursor: pointer;
     width: rem(15px);
     height: rem(15px);
-    background: url('@/assets/img/info.svg') no-repeat;
+    background: url('@/assets/img/edit.svg') no-repeat;
+    transition: all 0.2s ease;
     background-size: cover;
   }
   &.active {
@@ -221,16 +255,33 @@ export default {
     line-height: rem(21px);
     color: #14121f;
     border: 1px solid #86868b80;
+
     &_additional {
-      z-index: 0;
+      z-index: 10;
       position: absolute;
       left: 100%;
       transform: translateX(-100%);
-      width: 16.5%;
+      width: 19.5%;
+      height: 100%;
       border: 1px solid transparent;
       border-top-left-radius: 0;
       border-bottom-left-radius: 0;
-      padding: rem(15px) rem(15px) rem(15px) rem(15px);
+      padding: 0;
+      border-left: 1px solid transparent !important;
+      ::v-deep {
+        input.display-time {
+          font-size: rem(14px);
+          line-height: rem(21px);
+          font-weight: 500;
+          background: transparent;
+          outline: none !important;
+          width: 100%;
+          height: 100%;
+          border-radius: rem(0px) rem(13px) rem(13px) rem(0px);
+          border: 1px solid transparent !important;
+          padding: rem(15px) rem(15px) rem(15px) rem(15px) !important;
+        }
+      }
     }
     &.error {
       border: 1px solid red;
@@ -324,5 +375,9 @@ export default {
   .input-wrapper.file.deletable::after {
     right: 17.5%;
   }
+}
+
+.input-wrapper .main-screen__form-input_additional:active {
+  border: 1px solid transparent !important;
 }
 </style>

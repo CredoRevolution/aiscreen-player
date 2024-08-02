@@ -16,6 +16,7 @@
             @click="copyId"
             v-show="!idCopied"
             ref="copy"
+            class="copy-img"
           />
           <img
             src="@/assets/img/check.svg"
@@ -26,11 +27,7 @@
           />
         </div>
         <ul class="chanel-tags">
-          <li
-            class="chanel-tag"
-            v-for="tag in playerSettings.tags"
-            @click="openSettings"
-          >
+          <li class="chanel-tag" v-for="tag in playerSettings.tags">
             {{ tag.name }}
           </li>
         </ul>
@@ -254,7 +251,6 @@ export default {
     },
     copyId() {
       navigator.clipboard.writeText(this.playerId)
-      this.$refs.copy.style.transition = 'opacity 0.2s ease-in-out'
       this.$refs.copied.style.transition = 'opacity 0.2s ease-in-out'
       setTimeout(() => {
         this.$refs.copied.style.opacity = '1'
@@ -270,10 +266,7 @@ export default {
       setTimeout(() => {
         this.$refs.copy.style.opacity = '1'
       }, 2400)
-      setTimeout(() => {
-        this.$refs.copy.style.transition = 'none'
-        this.$refs.copied.style.transition = 'none'
-      }, 4000)
+      setTimeout(() => {}, 4000)
     },
     getData(place, field, value) {
       this[field] = value
@@ -366,8 +359,13 @@ export default {
         flex-direction: row;
         align-items: center;
         gap: rem(8px);
-        img {
+        img.copy-img {
           cursor: pointer;
+          transition: all 0.2s ease;
+          &:hover {
+            transition: all 0.2s ease;
+            filter: brightness(0);
+          }
         }
       }
       .chanel-tags {

@@ -27,8 +27,8 @@
       ]"
       :readonly="file"
       :required="required"
-      :ipAddress="ipAddress"
       v-model.trim="name"
+      v-mask="mask"
       @click="
         resetValidation()
         uploadFile()
@@ -76,12 +76,9 @@
     <div class="error-message" v-if="showError && !$v.name.phoneCheck && phone">
       Please enter a valid phone number
     </div>
-    <div
-      class="error-message"
-      v-if="showError && !$v.name.ipAddress && ipAddress"
-    >
+    <!-- <div class="error-message" v-if="showError && !$v.name.ipAddress &&">
       Please enter a valid IP address
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -139,15 +136,15 @@ export default {
       required: false,
       default: false,
     },
-    ipAddress: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
     info: {
       type: Boolean,
       required: false,
       default: false,
+    },
+    mask: {
+      type: String,
+      required: false,
+      default: null,
     },
   },
   data() {
@@ -177,15 +174,6 @@ export default {
         return !!value
       },
       minLength: minLength(3),
-      ipAddress(value) {
-        if (!this.ipAddress) {
-          return true
-        }
-        if (value === '') return true
-        const regex =
-          /^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])$/
-        return regex.test(value)
-      },
     },
   },
   mounted() {
