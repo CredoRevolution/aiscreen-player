@@ -115,6 +115,14 @@ export default {
         legend: {
           display: false,
         },
+        layout: {
+          padding: {
+            top: 7,
+            bottom: 7,
+            left: 7,
+            right: 7,
+          },
+        },
         scales: {
           xAxes: [
             {
@@ -158,7 +166,7 @@ export default {
       chart: null,
       currentTemperature: 0,
       currentTime: '',
-      maxPoints: 100,
+      maxPoints: 10,
     }
   },
 
@@ -249,5 +257,8 @@ export default {
   transform: translateX(50%);
   margin-bottom: rem(-8px);
   font-weight: 400;
+  div {
+    font-family: 'Poppins', sans-serif;
+  }
 }
 </style>

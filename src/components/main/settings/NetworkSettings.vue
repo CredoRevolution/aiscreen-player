@@ -22,7 +22,9 @@
       </div>
       <div class="network-settings-item">
         <div class="item-name">IP Address</div>
-        <div class="item-value">192-168-24-00</div>
+        <div class="item-value">
+          {{ this.formSettings.network.wifi.ipv4.address }}
+        </div>
       </div>
       <div class="network-settings-item">
         <div class="item-name">MAC Address</div>

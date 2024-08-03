@@ -24,6 +24,7 @@
           :defaultErrorText="'Option is required'"
           :form-field="'method'"
           :formPlace="['ipv4']"
+          :defaultValue="{ name: 'Manual (Static IP)' }"
           @getData="getData"
           ref="validation1"
         />
@@ -34,7 +35,8 @@
           :formPlace="['ipv4']"
           :input-name="'IP'"
           :form-field="'address'"
-          :mask="'###-###-###-###/##'"
+          :defaultName="'089.000.000.000'"
+          :mask="'###.###.###.###'"
           @getData="getData"
           ref="validation2"
         />
@@ -45,6 +47,8 @@
           :formPlace="['ipv4']"
           :form-field="'gateway'"
           :input-name="'gateway'"
+          :mask="'###.###.###.###'"
+          :defaultName="'089.100.100.100'"
           @getData="getData"
           ref="validation3"
           :required="form.ipv4.address !== ''"
@@ -59,7 +63,8 @@
           :formPlace="['dns']"
           :ipAddress="true"
           :form-field="`${index}`"
-          :input-name="'IP'"
+          :input-name="'DNS'"
+          :mask="'###.###.###.###'"
           @getData="getData"
           deletable
           ref="validation4"
@@ -78,6 +83,7 @@
             :formField="'address'"
             :required="form.proxy.server.port !== ''"
             :input-name="'host'"
+            :mask="'####.####.####.####'"
             @getData="getData"
             ref="validation5"
           />
@@ -88,6 +94,7 @@
             :formField="'port'"
             :input-name="'port'"
             :required="form.proxy.server.address !== ''"
+            :mask="'#####'"
             @getData="getData"
             ref="validation6"
           />
@@ -154,7 +161,7 @@ export default {
         'Trusted Site’s Certificates',
       ],
       Options: [{ name: 'Automatic DHCP' }, { name: 'Manual (Static IP)' }],
-      selectedTab: '',
+      selectedTab: 'IP Address',
       form: {
         ipv4: {
           method: '',
@@ -200,7 +207,6 @@ export default {
         } else {
           formObj[formField] = selectedValue.trim()
         }
-
         this.$emit('sendAdvancedForm', this.form, this.selectedTab)
         return
       }
@@ -252,6 +258,8 @@ export default {
     },
   },
   mounted() {
+    this.selectedTab = 'IP Address'
+    this.$emit('sendAdvancedForm', this.form, this.selectedTab)
     // setTimeout(() => {
     //   this.$refs.customTabsAdvanced.$refs.tabs[0].click()
     // })

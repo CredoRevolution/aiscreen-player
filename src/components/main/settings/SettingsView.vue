@@ -316,6 +316,7 @@ export default {
     font-size: rem(12px);
     line-height: rem(23px);
     color: white;
+    font-weight: 700;
     width: max-content;
   }
   .chanel-wrapper {
@@ -328,7 +329,7 @@ export default {
       display: flex;
       flex-direction: column;
       .chanel-status {
-        font-weight: 500;
+        font-weight: 700;
         font-size: rem(17px);
         line-height: rem(21px);
         color: rgba(134, 134, 139, 1);
@@ -374,6 +375,7 @@ export default {
         align-items: center;
         gap: rem(8px);
         list-style: none;
+
         .chanel-tag {
           font-weight: 400;
           font-size: rem(11px);
@@ -384,6 +386,7 @@ export default {
           border-radius: rem(45px);
           transition: all 0.3s ease;
           cursor: pointer;
+          font-family: 'Poppins', sans-serif;
           &:hover {
             background: rgba(20, 18, 31, 1);
             color: rgba(255, 255, 255, 1);

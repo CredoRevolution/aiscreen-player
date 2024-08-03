@@ -23,6 +23,7 @@
         deletable ? 'deletable' : '',
         file ? 'file' : '',
         hidden ? 'password' : '',
+        timePicker ? 'timePicker' : '',
         !$v.name.$error && $v.name.$model ? 'valid' : '',
       ]"
       :readonly="file"
@@ -38,6 +39,19 @@
       @input="sendData"
       ref="input"
     />
+    <vue-timepicker
+      :class="[
+        'main-screen__form-input',
+        'main-screen__form-input_additional',
+        active,
+      ]"
+      format="hh:mm a"
+      v-model="name"
+      v-if="timePicker"
+      close-on-complete
+      hide-clear-button
+      @change="sendData"
+    ></vue-timepicker>
     <div class="info-tooltip" v-if="info">
       <!-- <img src="@/assets/img/info.svg" alt=""> -->
     </div>
@@ -84,6 +98,10 @@
 
 <script>
 import { required, minLength } from 'vuelidate/lib/validators'
+import VueTimepicker from 'vue2-timepicker'
+
+// CSS
+import 'vue2-timepicker/dist/VueTimepicker.css'
 
 export default {
   name: 'CustomInput',
@@ -94,6 +112,10 @@ export default {
     },
     defaultName: {
       type: String,
+      required: false,
+    },
+    defaultNameTime: {
+      type: Object,
       required: false,
     },
     phone: {
@@ -146,6 +168,11 @@ export default {
       required: false,
       default: null,
     },
+    timePicker: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -156,6 +183,9 @@ export default {
       baseFile: '',
       showPasswordIcon: false,
     }
+  },
+  components: {
+    VueTimepicker,
   },
   validations: {
     name: {
@@ -177,6 +207,13 @@ export default {
     },
   },
   mounted() {
+    if (this.defaultNameTime) {
+      this.name =
+        this.defaultNameTime.hh +
+        ':' +
+        this.defaultNameTime.mm +
+        this.defaultNameTime.a
+    }
     this.resetValidation()
     this.focus()
     this.sendData()
@@ -392,6 +429,10 @@ export default {
     line-height: rem(21px);
     color: #14121f;
     border: 1px solid #86868b80;
+    &.timePicker {
+      pointer-events: none;
+      opacity: 1;
+    }
     &.error {
       border: 1px solid red;
     }
@@ -442,6 +483,71 @@ export default {
     &:focus-visible {
       border: 1px solid #0071e2 !important;
       outline: none;
+    }
+    &_additional {
+      z-index: 10;
+      position: absolute;
+      left: 100%;
+      transform: translateX(-100%);
+      width: 100%;
+      height: 100%;
+      border: none;
+      padding: 0;
+      border-left: 1px solid transparent !important;
+      background: transparent;
+      ::v-deep {
+        input.display-time {
+          font-size: rem(14px);
+          line-height: rem(21px);
+          font-weight: 500;
+          background: transparent;
+          opacity: 0;
+
+          outline: none !important;
+          width: 100%;
+          height: rem(54px);
+          border-radius: rem(0px) rem(13px) rem(13px) rem(0px);
+          border: 1px solid transparent !important;
+          padding: rem(15px) rem(15px) rem(15px) rem(15px) !important;
+        }
+        &.vue__time-picker {
+          .dropdown {
+            border-radius: rem(13px);
+
+            opacity: 1 !important;
+            top: 95%;
+            .select-list {
+              ul {
+                &::-webkit-scrollbar {
+                  width: 4px;
+                  height: 4px;
+                  margin-left: -10px;
+                }
+
+                &::-webkit-scrollbar-thumb {
+                  background-color: rgba(235, 235, 236, 1) !important;
+                  border-radius: 10px !important;
+                  margin-left: -10px;
+                }
+
+                &::-webkit-scrollbar-track {
+                  background-color: rgba(255, 255, 255, 1) !important;
+                  border-radius: 10px !important;
+                  margin-left: -10px;
+                }
+                li {
+                  font-size: rem(14px) !important;
+                  line-height: rem(21px) !important;
+                  font-weight: 500 !important;
+                  &.active {
+                    background: #0071e2 !important;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }

@@ -281,6 +281,40 @@ export default {
           border: 1px solid transparent !important;
           padding: rem(15px) rem(15px) rem(15px) rem(15px) !important;
         }
+        &.vue__time-picker {
+          .dropdown {
+            border-radius: rem(13px);
+            .select-list {
+              ul {
+                &::-webkit-scrollbar {
+                  width: 4px;
+                  height: 4px;
+                  margin-left: -10px;
+                }
+
+                &::-webkit-scrollbar-thumb {
+                  background-color: rgba(235, 235, 236, 1) !important;
+                  border-radius: 10px !important;
+                  margin-left: -10px;
+                }
+
+                &::-webkit-scrollbar-track {
+                  background-color: rgba(255, 255, 255, 1) !important;
+                  border-radius: 10px !important;
+                  margin-left: -10px;
+                }
+                li {
+                  font-size: rem(14px) !important;
+                  line-height: rem(21px) !important;
+                  font-weight: 500 !important;
+                  &.active {
+                    background: #0071e2 !important;
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
     &.error {

@@ -270,6 +270,8 @@ export default {
     position: unset;
     margin-right: rem(6px);
     .custom-tag {
+      font-family: 'Poppins', sans-serif;
+
       font-size: rem(11px);
       line-height: rem(20px);
       font-weight: 400;

@@ -13,7 +13,7 @@
       <ScreenSettings @rebootScreen="rebootScreen" />
       <div class="display-screen-wrapper" ref="screenWrapper">
         <img
-          v-if="screenStatus == 'ready'"
+          v-show="screenStatus == 'ready'"
           src="@/assets/img/screen.png"
           alt="screen"
           class="display-screen"
@@ -24,14 +24,14 @@
           alt="loading"
           class="display-screen display-screen_loading"
           ref="loadingScreen"
-          v-if="screenStatus === 'loading'"
+          v-show="screenStatus === 'loading'"
         />
         <img
           src="@/assets/img/check.svg"
           alt="loading"
           class="display-screen display-screen_loading"
-          ref="loadingScreen"
-          v-if="screenStatus === 'ok'"
+          ref="loadingScreenReady"
+          v-show="screenStatus === 'ok'"
         />
       </div>
       <div class="display-scale-wrapper">
@@ -72,10 +72,15 @@ export default {
     return {
       screenStatus: 'ready',
       screenTabs: ['0°', '90°', '180°', '270°'],
+      currentScreenDegree: 0,
+      currentlyRebooting: false,
     }
   },
   methods: {
     changeScale() {
+      if (!this.$refs.screen) {
+        return
+      }
       this.$refs.scale.style.background = `linear-gradient(to right, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) ${this.$refs.scale.value}%, rgba(255, 255, 255, 1) ${this.$refs.scale.value}%)`
       this.$refs.scaleInput.value = this.$refs.scale.value * 2
       this.$refs.screen.style.transform = `scale(${
@@ -90,10 +95,18 @@ export default {
       }
     },
     rotateScreen(value) {
+      if (this.currentlyRebooting) {
+        return
+      }
       const degrees = value.slice(0, -2)
+      this.currentScreenDegree = degrees
+      console.log(
+        'rotateScreen',
+        this.currentScreenDegree,
+        this.currentlyRebooting
+      )
       this.$refs.screenWrapper.style.transition = `all 0.3s ease`
       this.$refs.screen.style.transition = `all 0.3s ease`
-      this.$refs.screenWrapper.style.transform = `rotate(${degrees}deg)`
       this.$refs.screenWrapper.style.margin = 0
       if (degrees == 90 || degrees == 270) {
         this.$refs.screenWrapper.style.width =
@@ -101,22 +114,44 @@ export default {
         this.$refs.screenWrapper.style.height =
           this.$refs.screen.offsetHeight + 20 + 'px'
         this.$refs.screenWrapper.style.marginTop =
-          this.$refs.screenWrapper.offsetHeight / 2 + 'px'
+          this.$refs.screenWrapper.offsetHeight / 8 + 'px'
         this.$refs.screenWrapper.style.marginBottom =
-          this.$refs.screenWrapper.offsetHeight / 2 + 'px'
+          this.$refs.screenWrapper.offsetHeight / 8 + 'px'
+        this.$refs.screenWrapper.style.transform =
+          'rotate(' + degrees + 'deg) scale(0.7)'
+      } else if (degrees == 180) {
+        this.$refs.screenWrapper.style.width =
+          this.$refs.screen.offsetWidth + 20 + 'px'
+        this.$refs.screenWrapper.style.height =
+          this.$refs.screen.offsetHeight + 20 + 'px'
+        this.$refs.screenWrapper.style.transform =
+          'rotate(' + degrees + 'deg) scale(1)'
+      } else {
+        this.$refs.screenWrapper.style.transform =
+          'rotate(' + degrees + 'deg) scale(1)'
       }
     },
     rebootScreen() {
+      if (this.currentlyRebooting) {
+        return
+      }
+      this.currentlyRebooting = true
       let height = this.$refs.screenWrapper.offsetHeight
       let width = this.$refs.screenWrapper.offsetWidth
       this.$refs.screenWrapper.style.height = height + 'px'
       this.$refs.screenWrapper.style.width = width + 'px'
+
       this.screenStatus = 'loading'
+      const degrees = this.currentScreenDegree * -1
+      this.$refs.loadingScreen.style.transform = `rotate(${degrees}deg)`
+      this.$refs.loadingScreenReady.style.transform = `rotate(${degrees}deg)`
+
       setTimeout(() => {
         this.screenStatus = 'ok'
       }, 2000)
       setTimeout(() => {
         this.screenStatus = 'ready'
+        this.currentlyRebooting = false
       }, 3000)
     },
   },
@@ -159,11 +194,12 @@ export default {
       border: 10px solid black;
       border-radius: rem(24px);
       overflow: hidden;
+      width: 41vw;
       img {
         width: 100%;
       }
       .display-screen_loading {
-        width: 50%;
+        width: 20% !important;
       }
     }
     .display-scale-wrapper {
@@ -233,7 +269,7 @@ export default {
     transform: scale(0.85);
   }
   .dispay-wrapper .display-main-wrapper .display-screen-wrapper {
-    width: 90%;
+    width: 45vw;
   }
 }
 </style>

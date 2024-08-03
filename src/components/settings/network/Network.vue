@@ -391,7 +391,7 @@ export default {
           name: '5GHz',
         },
       ],
-      selectedTab: '',
+      selectedTab: 'Wi-Fi',
       customTabs: ['Wi-Fi', 'Ethernet'],
       authentificationMethods: [
         {
@@ -428,7 +428,6 @@ export default {
     settings() {
       if (this.settings) {
         this.$refs.validation1.activateTabs()
-        console.log('activate')
       }
     },
     form: {
@@ -440,56 +439,7 @@ export default {
   },
 
   methods: {
-    getAdvancedForm(form, selectedTab) {
-      if (selectedTab === null) {
-        return
-      }
-      if (
-        selectedTab &&
-        selectedTab.trim() == 'IP Address' &&
-        this.selectedTab == 'Ethernet'
-      ) {
-        this.form.network.ethernet.ipv4 = {
-          ...form.ipv4,
-        }
-      }
-      if (
-        selectedTab &&
-        selectedTab.trim() == 'IP Address' &&
-        this.selectedTab == 'Wi-Fi'
-      ) {
-        this.form.network.wifi.ipv4 = {
-          ...form.ipv4,
-        }
-      }
-      if (
-        selectedTab &&
-        selectedTab.trim() == 'DNS' &&
-        this.selectedTab == 'Wi-Fi'
-      ) {
-        this.form.network.wifi.dns = [...form.dns]
-      }
-      if (
-        selectedTab &&
-        selectedTab.trim() == 'DNS' &&
-        this.selectedTab == 'Ethernet'
-      ) {
-        this.form.network.ethernet.dns = [...form.dns]
-      }
-      if (selectedTab && selectedTab.trim() == 'Proxy') {
-        this.form.proxy = {
-          ...form.proxy,
-        }
-      }
-      if (selectedTab && selectedTab.trim() == 'NTP') {
-        this.form.ntp = [...form.ntp]
-      }
-      if (selectedTab && selectedTab.trim() == 'Trusted Site’s Certificates') {
-        this.form.trust_certificates = [...form.trust_certificates]
-      }
-    },
     getData(formPlace, formField, selectedValue) {
-      console.log(formPlace, formField, selectedValue)
       if (formPlace) {
         let formObj = this.form
         for (let i = 0; i < formPlace.length; i++) {
@@ -510,7 +460,8 @@ export default {
       }
     },
     getAdvancedForm(form, selectedTab) {
-      if (selectedTab === null) {
+      if (selectedTab === '') {
+        console.log('нет активной вкладки')
         return
       }
       if (
@@ -633,7 +584,6 @@ export default {
       }
     },
     sendFormData() {
-      console.log(this.form)
       this.$emit('sendFormData', this.form)
     },
     saveSettings() {

@@ -7,7 +7,7 @@
         :inputName="'time'"
         :info="true"
         :timePicker="true"
-        :defaultName="'10:09am'"
+        :defaultNameTime="{ hh: '12', mm: '09', a: 'am' }"
         :formField="'wakeUpTime'"
         v-model="playerData.wakeUpTime"
         @getData="getData"
@@ -251,9 +251,12 @@ export default {
       font-size: rem(11px);
       line-height: rem(20px);
       font-weight: 400;
+      font-family: 'Poppins', sans-serif;
+
       &--active {
         background-color: #0071e2;
         color: #f5f5f8;
+        font-family: 'Poppins', sans-serif;
       }
     }
   }
