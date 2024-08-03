@@ -11,7 +11,11 @@
     </div>
     <div class="display-main-wrapper">
       <ScreenSettings @rebootScreen="rebootScreen" />
-      <div class="display-screen-wrapper" ref="screenWrapper">
+      <div
+        class="display-screen-wrapper"
+        ref="screenWrapper"
+        :class="[currentScreenDegree == 0 ? 'shadow' : '']"
+      >
         <img
           v-show="screenStatus == 'ready'"
           src="@/assets/img/screen.png"
@@ -195,6 +199,9 @@ export default {
       border-radius: rem(24px);
       overflow: hidden;
       width: 41vw;
+      &.shadow {
+        box-shadow: 0px 31px 40px -30px #14121f80;
+      }
       img {
         width: 100%;
       }

@@ -110,7 +110,7 @@ export default {
         color: rgba(134, 134, 139, 1);
         font-weight: 500;
         font-size: rem(14px);
-        line-height: rem(17px);
+        line-height: rem(21px);
       }
       .item-value {
         font-weight: 700;

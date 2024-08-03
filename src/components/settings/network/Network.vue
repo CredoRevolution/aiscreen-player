@@ -37,7 +37,7 @@
           class="search-select_mb"
           v-show="selectedTab === 'Wi-Fi'"
           :optionsCount="networkFrequencies"
-          :defaultValue="{ name: '2.4GHz' }"
+          :defaultValue="{ name: '2.gGHz' }"
           :search="false"
           :defaultText="'Network frequency'"
           :defaultErrorText="'Frequency is required'"
@@ -385,10 +385,10 @@ export default {
       ],
       networkFrequencies: [
         {
-          name: '2.4GHz',
+          name: '2.4gHz',
         },
         {
-          name: '5GHz',
+          name: '5gHz',
         },
       ],
       selectedTab: 'Wi-Fi',
