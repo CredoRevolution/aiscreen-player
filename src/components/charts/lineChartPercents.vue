@@ -45,6 +45,7 @@ Chart.plugins.register({
           chart.$vue._data.currentTime = label.toLocaleTimeString([], {
             hour: '2-digit',
             minute: '2-digit',
+            hour12: true,
           })
         }
       }
@@ -193,7 +194,7 @@ export default {
         const timeString = currentTime.toLocaleTimeString([], {
           hour: '2-digit',
           minute: '2-digit',
-          hour12: false,
+          hour12: true,
         })
 
         this.chartData.labels.push(currentTime)
@@ -258,6 +259,7 @@ export default {
   transform: translateX(50%);
   margin-bottom: rem(-8px);
   font-weight: 400;
+  width: max-content;
   div {
     font-family: 'Poppins', sans-serif;
   }
