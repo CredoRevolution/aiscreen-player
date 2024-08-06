@@ -113,10 +113,11 @@
               <li
                 class="wifi__item"
                 v-for="network in this.$store.getters.availableNetworks"
-                :key="network.name"
+                :key="network.network.wifi.ssid"
                 :class="[
                   $store.getters.activeNetwork &&
-                  $store.getters.activeNetwork.name == network.name
+                  $store.getters.activeNetwork.network.wifi.ssid ==
+                    network.network.wifi.ssid
                     ? 'active'
                     : '',
                 ]"
@@ -195,7 +196,7 @@
                     </circle>
                   </svg>
 
-                  {{ network.name }}
+                  {{ network.network.wifi.ssid }}
                 </div>
                 <div class="wifi-item__status">
                   <img src="@/assets/img/wifi-lock.svg" alt="" />

@@ -96,10 +96,11 @@
           <li
             class="wifi__item"
             v-for="network in $store.getters.availableNetworks"
-            :key="network.name"
+            :key="network.network.wifi.ssid"
             :class="[
               $store.getters.activeNetwork &&
-              $store.getters.activeNetwork.name == network.name
+              $store.getters.activeNetwork.network.wifi.ssid ==
+                network.network.wifi.ssid
                 ? 'active'
                 : '',
             ]"
@@ -178,7 +179,7 @@
                 </circle>
               </svg>
 
-              {{ network.name }}
+              {{ network.network.wifi.ssid }}
             </div>
 
             <div class="wifi-item__status">
@@ -453,7 +454,7 @@ export default {
       this.isConnecting = network
       document.body.style.pointerEvents = 'none'
       setTimeout(() => {
-        this.name = network.name
+        this.name = network.network.wifi.ssid
         this.isConnecting = false
         this.$store.commit('setActiveNetwork', network)
         document.body.style.pointerEvents = 'unset'

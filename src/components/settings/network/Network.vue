@@ -14,7 +14,7 @@
           :defaultErrorText="'Network name (SSID) is required'"
           :defaultName="
             $store.getters.activeNetwork
-              ? $store.getters.activeNetwork.name
+              ? $store.getters.activeNetwork.network.wifi.ssid
               : 'aiscrern'
           "
           :formField="'ssid'"
@@ -328,6 +328,8 @@ import SearchSelect from '@/components/form/SearchSelect.vue'
 import AdvancedSettings from '@/components/settings/network/AdvancedSettings.vue'
 import moment from 'moment-timezone'
 
+import availableNetworks from '@/assets/availableNetworks.json'
+
 export default {
   name: 'Network',
   components: {
@@ -414,6 +416,7 @@ export default {
 
       timezone: [],
       guestedTimezone: '',
+      creatingNewNetwork: false,
       readyJSON: {},
     }
   },
@@ -623,6 +626,19 @@ export default {
       this.$emit('sendFormData', this.form)
     },
     saveSettings() {
+      if (this.creatingNewNetwork) {
+        console.log('creating new network')
+        if (this.checkAllValidations()) {
+          const availableNetworks =
+            this.$store.getters.availableNetworks.slice() // Клонируем массив, чтобы не изменять оригинальный
+          availableNetworks.push(this.form) // Добавляем новую сеть
+          console.log(availableNetworks) // Выводим обновленный массив
+          this.$store.commit('setAvailableNetworks', availableNetworks) // Передаем обновленный массив в коммит
+          console.log(this.$store.getters.availableNetworks) // Выводим доступные сети из хранилища
+        }
+        this.creatingNewNetwork = false
+      }
+
       if (this.checkAllValidations()) {
         this.$emit('saveSettings', this.form)
       }
@@ -630,6 +646,7 @@ export default {
     addNetwork() {
       this.clearNetwork()
       this.$refs.validation01._data.active = true
+      this.creatingNewNetwork = true
     },
     clearNetwork() {
       const fields = [
