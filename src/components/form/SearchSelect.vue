@@ -24,7 +24,7 @@
       name="select"
       v-model="value"
       track-by="name"
-      @select="checkState"
+      @select="handleSelect"
       @open="handleOpen"
       @close="checkLabel"
     >
@@ -52,6 +52,7 @@ export default {
       showError: false,
       active: false,
       showValue: false,
+      isUserSelected: false, // Track if selection is user-initiated
     }
   },
   props: {
@@ -132,6 +133,7 @@ export default {
     checkLabel() {
       if (this.value.name === this.defaultText) {
         this.active = false
+        this.showValue = false
         return
       }
       this.showValue = true
@@ -185,19 +187,43 @@ export default {
         }
       })
     },
+    handleSelect(selectedValue) {
+      this.isUserSelected = true
+      this.value = selectedValue
+      this.checkState()
+    },
+    clearField() {
+      this.isUserSelected = true
+      this.value = { name: this.defaultText, code: this.defaultText }
+      this.checkState()
+      this.resetValidation()
+      this.checkLabel()
+    },
   },
 
   mounted() {
     this.resetValidation()
     this.checkState()
-    setTimeout(() => {
-      if (this.defaultValue) {
-        this.value = this.defaultValue
-        this.checkLabel()
-        this.showValue = true
-        this.checkState()
-      }
-    }, 0)
+    if (this.defaultValue) {
+      this.value = this.defaultValue
+      this.checkLabel()
+      this.showValue = true
+      this.checkState()
+    }
+  },
+  watch: {
+    defaultValue: {
+      handler(newValue) {
+        if (!this.isUserSelected) {
+          this.value = newValue
+          this.checkLabel()
+          this.showValue = true
+          this.checkState()
+        }
+        this.isUserSelected = false // Reset after handling
+      },
+      deep: true,
+    },
   },
 }
 </script>

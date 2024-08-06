@@ -259,6 +259,8 @@ export default {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
+  cursor: text;
+
   .multiselect__tags-wrap {
     display: flex;
     flex-direction: row;
@@ -286,6 +288,7 @@ export default {
       flex-direction: row;
       align-items: center;
       gap: rem(4px);
+      cursor: default;
       .remove-tag {
         padding: 0 rem(5px);
         background: #e3e3e6;

@@ -1,0 +1,17 @@
+[
+  {
+    "name": "wifi1",
+    "ip": "192.168.0.1",
+    "mac": "00:00:00:00:00:01",
+    "frequency": 2.4,
+    "authentication": "Basic (WPA2 Personal)",
+    "password": "12345678"
+  },
+  {
+    "name": "wifi2",
+    "ip": "192.168.0.2",
+    "mac": "00:00:00:00:00:02",
+    "frequency": 5.6,
+    "authentication": "None"
+  }
+]

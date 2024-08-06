@@ -1,15 +1,15 @@
 <template>
   <div id="app">
-    <MainView />
+    <PlayerSettings />
   </div>
 </template>
 
 <script>
-import MainView from './components/MainView.vue'
+import PlayerSettings from './components/PlayerSettings.vue'
 export default {
   name: 'App',
   components: {
-    MainView,
+    PlayerSettings,
   },
 }
 </script>
@@ -26,3 +26,4 @@ export default {
   height: 100vh;
 }
 </style>
+./components/PlayerSettings.vue

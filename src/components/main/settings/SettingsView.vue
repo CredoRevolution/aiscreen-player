@@ -1,5 +1,5 @@
 <template>
-  <div class="settings-wrapper">
+  <div class="settings-wrapper" ref="SettingsView">
     <div class="online-switch">Online</div>
     <div class="chanel-wrapper">
       <div class="chanel-main">
@@ -32,8 +32,180 @@
           </li>
         </ul>
       </div>
-      <div class="settings-btn" @click="toggleSettings">
-        <div class="settings-btn__svg">
+      <div class="settings-btn">
+        <div class="settings-btn__svg" @click="toggleWifiSettings">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M12.0002 19C11.4479 19 11.0002 19.4477 11.0002 20C11.0002 20.5523 11.4479 21 12.0002 21V19ZM12.0102 21C12.5625 21 13.0102 20.5523 13.0102 20C13.0102 19.4477 12.5625 19 12.0102 19V21ZM14.6907 17.04C15.0993 17.4116 15.7317 17.3817 16.1033 16.9732C16.475 16.5646 16.445 15.9322 16.0365 15.5605L14.6907 17.04ZM18.0541 13.3403C18.4626 13.7119 19.0951 13.682 19.4667 13.2734C19.8384 12.8649 19.8084 12.2324 19.3999 11.8608L18.0541 13.3403ZM7.96395 15.5605C7.5554 15.9322 7.52547 16.5646 7.89709 16.9732C8.26872 17.3817 8.90118 17.4116 9.30972 17.04L7.96395 15.5605ZM4.60056 11.8608C4.19201 12.2324 4.16208 12.8649 4.5337 13.2734C4.90533 13.682 5.53779 13.7119 5.94634 13.3403L4.60056 11.8608ZM12.0002 21H12.0102V19H12.0002V21ZM12.0002 16C13.0369 16 13.9795 16.3931 14.6907 17.04L16.0365 15.5605C14.9715 14.5918 13.5538 14 12.0002 14V16ZM12.0002 11C14.3321 11 16.4548 11.8855 18.0541 13.3403L19.3999 11.8608C17.4468 10.0842 14.8489 9 12.0002 9V11ZM9.30972 17.04C10.0209 16.3931 10.9635 16 12.0002 16V14C10.4466 14 9.02894 14.5918 7.96395 15.5605L9.30972 17.04ZM5.94634 13.3403C7.54566 11.8855 9.66837 11 12.0002 11V9C9.15149 9 6.55366 10.0842 4.60056 11.8608L5.94634 13.3403Z"
+              fill="#86868B"
+              fill-opacity="1"
+            />
+          </svg>
+        </div>
+
+        <div
+          class="wifi-settings"
+          v-show="wifiSettings == true"
+          ref="wifiSettings"
+        >
+          <div class="personal-wrapper">
+            <div class="wrapper__title">Personal Hotspot</div>
+            <ul class="wifi__list">
+              <li class="wifi__item">
+                <div class="wifi-item__name">
+                  <img src="@/assets/img/hotspot.svg" alt="" />
+                  Nikita
+                </div>
+                <div class="wifi-item__status">
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <rect
+                      x="1"
+                      y="14"
+                      width="4"
+                      height="5"
+                      rx="1"
+                      fill="#86868B"
+                    />
+                    <rect
+                      x="7"
+                      y="11"
+                      width="4"
+                      height="8"
+                      rx="1"
+                      fill="#86868B"
+                    />
+                    <rect
+                      x="13"
+                      y="8"
+                      width="4"
+                      height="11"
+                      rx="1"
+                      fill="#D9D9D9"
+                    />
+                    <rect
+                      x="19"
+                      y="5"
+                      width="4"
+                      height="14"
+                      rx="1"
+                      fill="#D9D9D9"
+                    />
+                  </svg>
+                  LTE
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div class="known-wrapper">
+            <div class="wrapper__title">Known Networks</div>
+            <ul class="wifi__list">
+              <li
+                class="wifi__item"
+                v-for="network in this.$store.getters.availableNetworks"
+                :key="network.name"
+                :class="[
+                  $store.getters.activeNetwork &&
+                  $store.getters.activeNetwork.name == network.name
+                    ? 'active'
+                    : '',
+                ]"
+                @click="connectToNetwork(network)"
+              >
+                <div class="wifi-item__name">
+                  <svg
+                    v-if="isConnecting !== network"
+                    width="12"
+                    height="12"
+                    viewBox="0 0 12 12"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M9.91747 4.89353C10.1818 5.14127 10.5911 5.12133 10.8316 4.84893C11.0721 4.5766 11.0527 4.15493 10.7883 3.9072L9.91747 4.89353ZM1.21168 3.9072C0.947306 4.15493 0.927938 4.5766 1.16841 4.84893C1.4089 5.12133 1.81816 5.14127 2.08253 4.89353L1.21168 3.9072ZM5.99999 3.33333C7.50896 3.33333 8.88256 3.92367 9.91747 4.89353L10.7883 3.9072C9.52448 2.7228 7.84338 2 5.99999 2V3.33333ZM2.08253 4.89353C3.11745 3.92367 4.49106 3.33333 5.99999 3.33333V2C4.15658 2 2.47553 2.7228 1.21168 3.9072L2.08253 4.89353Z"
+                      fill="#1F1F20"
+                    />
+                    <path
+                      d="M7.74034 7.36016C8.00475 7.6079 8.41398 7.58796 8.65444 7.31563C8.89496 7.04323 8.87555 6.62163 8.61121 6.37383L7.74034 7.36016ZM3.38746 6.37383C3.12309 6.62163 3.10372 7.04323 3.34419 7.31563C3.58468 7.58796 3.99394 7.6079 4.25831 7.36016L3.38746 6.37383ZM5.99932 6.66683C6.67017 6.66683 7.28013 6.9289 7.74034 7.36016L8.61121 6.37383C7.92205 5.72803 7.00466 5.3335 5.99932 5.3335V6.66683ZM4.25831 7.36016C4.71852 6.9289 5.32847 6.66683 5.99932 6.66683V5.3335C4.99399 5.3335 4.07661 5.72803 3.38746 6.37383L4.25831 7.36016Z"
+                      fill="#1F1F20"
+                    />
+                    <path
+                      d="M5.99866 8.6665C5.64127 8.6665 5.35156 8.96497 5.35156 9.33317C5.35156 9.70137 5.64127 9.99984 5.99866 9.99984V8.6665ZM6.00513 9.99984C6.36253 9.99984 6.65223 9.70137 6.65223 9.33317C6.65223 8.96497 6.36253 8.6665 6.00513 8.6665V9.99984ZM5.99866 9.99984H6.00513V8.6665H5.99866V9.99984Z"
+                      fill="#1F1F20"
+                    />
+                  </svg>
+                  <svg
+                    v-if="isConnecting == network"
+                    xmlns="http://www.w3.org/2000/svg"
+                    xmlns:xlink="http://www.w3.org/1999/xlink"
+                    style="margin: auto; display: block; shape-rendering: auto"
+                    width="200px"
+                    height="200px"
+                    viewBox="0 0 100 100"
+                    preserveAspectRatio="xMidYMid"
+                  >
+                    <circle
+                      cx="50"
+                      cy="50"
+                      r="32"
+                      stroke-width="8"
+                      stroke="#14121f"
+                      stroke-dasharray="50.26548245743669 50.26548245743669"
+                      fill="none"
+                      stroke-linecap="round"
+                    >
+                      <animateTransform
+                        attributeName="transform"
+                        type="rotate"
+                        dur="1s"
+                        repeatCount="indefinite"
+                        keyTimes="0;1"
+                        values="0 50 50;360 50 50"
+                      ></animateTransform>
+                    </circle>
+                    <circle
+                      cx="50"
+                      cy="50"
+                      r="23"
+                      stroke-width="8"
+                      stroke="#14121f"
+                      stroke-dasharray="36.12831551628262 36.12831551628262"
+                      stroke-dashoffset="36.12831551628262"
+                      fill="none"
+                      stroke-linecap="round"
+                    >
+                      <animateTransform
+                        attributeName="transform"
+                        type="rotate"
+                        dur="1s"
+                        repeatCount="indefinite"
+                        keyTimes="0;1"
+                        values="0 50 50;-360 50 50"
+                      ></animateTransform>
+                    </circle>
+                  </svg>
+
+                  {{ network.name }}
+                </div>
+                <div class="wifi-item__status">
+                  <img src="@/assets/img/wifi-lock.svg" alt="" />
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div class="network-btn" @click="toggleSettings">Add network</div>
+        </div>
+        <div class="settings-btn__svg" @click="toggleSettings">
           <svg
             width="24"
             height="24"
@@ -214,6 +386,9 @@ export default {
       ],
       cpuChart: '',
       gpuChart: '',
+      wifiSettings: false,
+      documentClickHandler: null,
+      isConnecting: null,
     }
   },
   computed: {
@@ -249,6 +424,40 @@ export default {
     openSettings() {
       this.$emit('toggleSettings')
     },
+    toggleWifiSettings() {
+      this.wifiSettings = !this.wifiSettings
+      console.log('wifi settings toggled:', this.wifiSettings)
+
+      setTimeout(() => {
+        if (this.wifiSettings) {
+          // Проверка, существует ли обработчик, и удаление его, если нужно
+          if (this.documentClickHandler) {
+            window.removeEventListener('click', this.documentClickHandler)
+          }
+
+          this.documentClickHandler = (e) => {
+            if (
+              this.$refs.wifiSettings &&
+              !this.$refs.wifiSettings.contains(e.target)
+            ) {
+              this.wifiSettings = false
+              window.removeEventListener('click', this.documentClickHandler)
+              this.documentClickHandler = null
+              console.log('Clicked outside, wifi settings closed.')
+            }
+          }
+
+          window.addEventListener('click', this.documentClickHandler)
+        } else {
+          // Удаление обработчика событий, если настройки закрываются
+          if (this.documentClickHandler) {
+            window.removeEventListener('click', this.documentClickHandler)
+            this.documentClickHandler = null
+          }
+        }
+      }, 500)
+    },
+
     copyId() {
       navigator.clipboard.writeText(this.playerId)
       this.$refs.copied.style.transition = 'opacity 0.2s ease-in-out'
@@ -271,8 +480,46 @@ export default {
     getData(place, field, value) {
       this[field] = value
     },
+    connectToNetwork(network) {
+      this.isConnecting = network
+      document.body.style.pointerEvents = 'none'
+      setTimeout(() => {
+        this.isConnecting = false
+        this.$store.commit('setActiveNetwork', network)
+        document.body.style.pointerEvents = 'unset'
+      }, 2000)
+    },
   },
-  mounted() {},
+  mounted() {
+    const settingsView = this.$refs.SettingsView
+
+    let isCursorOverSettingsView = false
+
+    settingsView.addEventListener('mouseenter', () => {
+      isCursorOverSettingsView = true
+    })
+
+    settingsView.addEventListener('mouseleave', () => {
+      isCursorOverSettingsView = false
+    })
+    window.addEventListener(
+      'wheel',
+      (event) => {
+        if (this.$refs.SettingsView && !isCursorOverSettingsView) {
+          const settingsView = this.$refs.SettingsView
+
+          // Scroll smoothly
+          settingsView.scrollBy({
+            top: event.deltaY,
+            behavior: 'smooth',
+          })
+        } else {
+          console.error('SettingsView ref not found')
+        }
+      },
+      { passive: false }
+    )
+  },
 }
 </script>
 
@@ -395,23 +642,137 @@ export default {
       }
     }
     .settings-btn {
-      cursor: pointer;
-      background: rgba(255, 255, 255, 1);
-      border: 1px solid rgba(134, 134, 139, 0.5);
-      border-radius: rem(13px);
-      padding: rem(14px);
-      padding-bottom: rem(9px);
-      transition: all 0.3s ease;
-      &:hover {
-        border: 1px solid rgba(20, 18, 31, 1);
-        background: rgba(20, 18, 31, 1);
-        svg {
-          path {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: rem(16px);
+      position: relative;
+      .settings-btn__svg {
+        cursor: pointer;
+        background: rgba(255, 255, 255, 1);
+        border: 1px solid rgba(134, 134, 139, 0.5);
+        border-radius: rem(13px);
+        padding: rem(14px);
+        padding-bottom: rem(9px);
+        transition: all 0.3s ease;
+        &:hover {
+          border: 1px solid rgba(20, 18, 31, 1);
+          background: rgba(20, 18, 31, 1);
+          svg {
+            path {
+              fill: #fff;
+            }
             fill: #fff;
           }
-          fill: #fff;
         }
       }
+      .wifi-settings {
+        position: absolute;
+        top: 100%;
+        right: 50%;
+        background: rgba(255, 255, 255, 1);
+        box-shadow: 0px 12px 24px 0px #0000001f;
+        width: rem(320px);
+        border-radius: rem(30px);
+        padding: rem(31px);
+        display: flex;
+        flex-direction: column;
+        gap: rem(17px);
+        .personal-wrapper {
+          border-bottom: 1px solid #f5f5f8;
+          padding-bottom: rem(17px);
+        }
+        .personal-wrapper,
+        .known-wrapper {
+          display: flex;
+          flex-direction: column;
+          gap: rem(12px);
+          .wrapper__title {
+            color: #86868b;
+            font-size: rem(14px);
+            line-height: rem(21px);
+            font-weight: 500;
+          }
+          .wifi__list {
+            display: flex;
+            flex-direction: column;
+            gap: rem(12px);
+            list-style: none;
+            .wifi__item {
+              display: flex;
+              flex-direction: row;
+              justify-content: space-between;
+              align-items: center;
+              cursor: pointer;
+
+              .wifi-item__name {
+                display: flex;
+                flex-direction: row;
+                gap: rem(8px);
+                align-items: center;
+                font-weight: 700;
+                font-size: rem(17px);
+                line-height: rem(21px);
+                letter-spacing: -0.02em;
+                color: #14121f;
+                svg {
+                  height: rem(24px);
+                  width: rem(24px);
+                  padding: rem(6px);
+                  background: #86868b29;
+                  border-radius: 50%;
+                }
+                img {
+                  padding: rem(6px);
+                  background: #86868b29;
+                  border-radius: 50%;
+                }
+              }
+              &.active {
+                svg {
+                  path {
+                    fill: #fff;
+                  }
+                  background: #0071e2;
+                }
+              }
+              .wifi-item__status {
+                display: flex;
+                flex-direction: row;
+                gap: rem(8px);
+                align-items: center;
+                font-weight: 700;
+                font-size: rem(17px);
+                line-height: rem(21px);
+                letter-spacing: -0.02em;
+                color: #86868b;
+              }
+            }
+          }
+        }
+        .network-btn {
+          font-size: rem(14px);
+          line-height: rem(21px);
+          font-weight: 700;
+          color: rgba(255, 255, 255, 1);
+          background: rgba(0, 113, 226, 1);
+          border-radius: rem(999px);
+          padding: rem(7px) rem(17px) rem(8px) rem(17px);
+          display: flex;
+          flex-direction: row;
+          justify-content: center;
+          align-items: center;
+          text-align: center;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          width: 100%;
+          border: 1px solid transparent;
+          &:hover {
+            opacity: 0.8;
+          }
+        }
+      }
+
       .settings-btn__svg {
         transition: all 0.3s ease;
       }
@@ -584,15 +945,21 @@ export default {
         }
       }
       .settings-btn {
-        cursor: pointer;
-        padding: rem(11px);
-        padding-bottom: rem(7px);
-        img {
-          transition: all 0.3s ease;
-        }
+        display: flex;
+        flex-direction: row;
+        gap: rem(5px);
+        align-items: center;
+        .settings-btn__svg {
+          cursor: pointer;
+          padding: rem(11px);
+          padding-bottom: rem(7px);
+          img {
+            transition: all 0.3s ease;
+          }
 
-        &:hover {
-          border: 1px solid rgba(20, 18, 31, 1);
+          &:hover {
+            border: 1px solid rgba(20, 18, 31, 1);
+          }
         }
       }
     }

@@ -15,6 +15,7 @@
         :playerSettings="playerSettings"
         :formSettings="formSettings"
         :playerId="playerId"
+        ref="SettingsView"
       />
     </div>
     <div class="main-wrapper_settings" v-show="settings == true">
@@ -33,8 +34,12 @@
 import DisplayView from '@/components/main/display/DisplayView.vue'
 import SettingsView from '@/components/main/settings/SettingsView.vue'
 import SettingsMain from './settings/SettingsMain.vue'
+
+// JSON data
+import availableNetworks from '@/assets/availableNetworks.json'
+
 export default {
-  name: 'MainView',
+  name: 'PlayerSettings',
   components: {
     DisplayView,
     SettingsView,
@@ -80,6 +85,10 @@ export default {
       this.settings = false
       console.log('saved settings', this.formSettings)
     },
+  },
+  mounted() {
+    this.$store.commit('setAvailableNetworks', availableNetworks)
+    console.log(this.$store.getters.availableNetworks)
   },
 }
 </script>

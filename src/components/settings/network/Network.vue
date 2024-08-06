@@ -8,36 +8,33 @@
         ref="validation1"
       />
       <template>
-        <CustomInput
+        <CustomInputWifi
           v-show="selectedTab === 'Wi-Fi'"
           :placeholderText="'Network name (SSID)'"
           :defaultErrorText="'Network name (SSID) is required'"
-          :defaultName="'AIscreen something'"
+          :defaultName="
+            $store.getters.activeNetwork
+              ? $store.getters.activeNetwork.name
+              : 'aiscrern'
+          "
           :formField="'ssid'"
           :formPlace="['network', 'wifi']"
           :inputName="'ssid'"
           :required="selectedTab === 'Wi-Fi'"
           @getData="getData"
-          ref="validation2"
-        />
-        <SearchSelect
-          v-show="selectedTab === 'Wi-Fi'"
-          :optionsCount="availableNetworks"
-          :defaultValue="{ name: 'Aiscreen' }"
-          :search="true"
-          :defaultText="'Available networks'"
-          :defaultErrorText="'Network is required'"
-          :form-place="['network', 'wifi']"
-          :formField="'Network'"
-          :required="selectedTab === 'Wi-Fi'"
-          @getData="getData"
-          ref="validation3"
+          @clearNetwork="clearNetwork"
+          @addNetwork="addNetwork"
+          ref="validation01"
         />
         <SearchSelect
           class="search-select_mb"
           v-show="selectedTab === 'Wi-Fi'"
           :optionsCount="networkFrequencies"
-          :defaultValue="{ name: '2.gGHz' }"
+          :defaultValue="
+            $store.getters.activeNetwork
+              ? { name: $store.getters.activeNetwork.frequency + 'gHz' }
+              : { name: '2.4gHz' }
+          "
           :search="false"
           :defaultText="'Network frequency'"
           :defaultErrorText="'Frequency is required'"
@@ -45,7 +42,7 @@
           :formField="'Frequency'"
           :required="selectedTab === 'Wi-Fi'"
           @getData="getData"
-          ref="validation3"
+          ref="validation2"
         />
         <SearchSelect
           v-show="selectedTab === 'Wi-Fi'"
@@ -53,9 +50,13 @@
           :search="false"
           :defaultText="'Authentification'"
           :defaultErrorText="'Authentification is required'"
-          :defaultValue="{
-            name: 'None',
-          }"
+          :defaultValue="
+            $store.getters.activeNetwork
+              ? {
+                  name: $store.getters.activeNetwork.authentication,
+                }
+              : { name: 'None' }
+          "
           :form-place="['network', 'wifi']"
           :formField="'Authentification'"
           :required="selectedTab === 'Wi-Fi'"
@@ -77,6 +78,13 @@
           :hidden="true"
           :formPlace="['network', 'wifi']"
           :inputName="'Password'"
+          :defaultName="
+            $store.getters.activeNetwork &&
+            $store.getters.activeNetwork.authentication ===
+              'Basic (WPA2 Personal)'
+              ? $store.getters.activeNetwork.password
+              : ''
+          "
           @getData="getData"
           ref="validation4"
         />
@@ -314,6 +322,7 @@
 
 <script>
 import CustomInput from '@/components/form/CustomInput.vue'
+import CustomInputWifi from '@/components/form/playerInputs/CustomInputWifi.vue'
 import CustomTabs from '@/components/form/CustomTabs.vue'
 import SearchSelect from '@/components/form/SearchSelect.vue'
 import AdvancedSettings from '@/components/settings/network/AdvancedSettings.vue'
@@ -325,6 +334,7 @@ export default {
     CustomInput,
     CustomTabs,
     SearchSelect,
+    CustomInputWifi,
     AdvancedSettings,
   },
   data() {
@@ -372,17 +382,6 @@ export default {
         ntp: [],
         trust_certificates: [],
       },
-      availableNetworks: [
-        {
-          name: 'Aiscreen',
-        },
-        {
-          name: 'Wifi1',
-        },
-        {
-          name: 'Wifi2',
-        },
-      ],
       networkFrequencies: [
         {
           name: '2.4gHz',
@@ -439,6 +438,43 @@ export default {
   },
 
   methods: {
+    checkAllValidations() {
+      this.validationCount = 0
+      const validations = [
+        this.$refs.validation1,
+        this.$refs.validation01,
+        this.$refs.validation2,
+        this.$refs.validation3,
+        this.$refs.validation4,
+        this.$refs.validation5,
+        this.$refs.validation6,
+        this.$refs.validation7,
+        this.$refs.validation8,
+        this.$refs.validation9,
+        this.$refs.validation10,
+        this.$refs.validation11,
+        this.$refs.validation12,
+        this.$refs.validation13,
+        this.$refs.validation14,
+      ]
+      let visibleValidations = 0
+      validations.forEach((item) => {
+        if (item && item.$el) {
+          visibleValidations++
+          item.checkValidation()
+        } else {
+          return
+        }
+        if (item.checkValidation()) {
+          this.validationCount++
+        }
+      })
+      if (this.$refs.advancedSettings.checkAllValidations()) {
+        if (this.validationCount === visibleValidations) {
+          return true
+        }
+      }
+    },
     getData(formPlace, formField, selectedValue) {
       if (formPlace) {
         let formObj = this.form
@@ -587,7 +623,33 @@ export default {
       this.$emit('sendFormData', this.form)
     },
     saveSettings() {
-      this.$emit('saveSettings', this.form)
+      if (this.checkAllValidations()) {
+        this.$emit('saveSettings', this.form)
+      }
+    },
+    addNetwork() {
+      this.clearNetwork()
+      this.$refs.validation01._data.active = true
+    },
+    clearNetwork() {
+      const fields = [
+        this.$refs.validation01,
+        this.$refs.validation2,
+        this.$refs.validation3,
+        this.$refs.validation4,
+        this.$refs.validation5,
+        this.$refs.validation6,
+        this.$refs.validation7,
+        this.$refs.validation8,
+        this.$refs.validation9,
+        this.$refs.validation10,
+        this.$refs.validation11,
+        this.$refs.validation12,
+        this.$refs.validation13,
+      ]
+      fields.forEach((field) => {
+        field.clearField()
+      })
     },
   },
   mounted() {

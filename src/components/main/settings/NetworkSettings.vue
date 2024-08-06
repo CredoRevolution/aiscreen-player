@@ -13,7 +13,7 @@
       <div class="network-settings-item">
         <div class="item-name">Network name</div>
         <div class="item-value">
-          {{ this.formSettings.network.wifi.Network }}
+          {{ this.formSettings.network.wifi.ssid }}
         </div>
       </div>
       <div class="network-settings-item">

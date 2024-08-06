@@ -39,51 +39,160 @@
       @input="sendData"
       ref="input"
     />
-    <vue-timepicker
-      :class="[
-        'main-screen__form-input',
-        'main-screen__form-input_additional',
-        active,
-      ]"
-      format="hh:mm a"
-      v-model="name"
-      v-if="timePicker"
-      close-on-complete
-      hide-clear-button
-      @change="sendData"
-    ></vue-timepicker>
-    <div class="info-tooltip" v-if="info">
-      <!-- <img src="@/assets/img/info.svg" alt=""> -->
+    <div class="show-password" @click="toggleWifiSettings">
+      <img
+        :src="require('@/assets/img/wifi-settings.svg')"
+        alt="show password"
+      />
     </div>
-    <div class="deletable" @click="deleteThisInput" v-if="deletable">
+    <div class="deletable" @click="clearNetwork">
       <img :src="require('@/assets/img/cross.svg')" alt="delete" />
     </div>
-    <div class="show-password" @click="showPassword" v-if="hidden">
-      <img
-        :src="require('@/assets/img/passwordHide.svg')"
-        alt="show password"
-        v-if="showPasswordIcon"
-      />
-      <img
-        :src="require('@/assets/img/passwordError.svg')"
-        alt="show password"
-        v-else-if="showError"
-      />
-      <img
-        :src="require('@/assets/img/passwordActive.svg')"
-        alt="show password"
-        v-else-if="active"
-      />
-      <img
-        :src="require('@/assets/img/passwordEye.svg')"
-        alt="show password"
-        v-else
-      />
+    <div class="wifi-settings" v-show="wifiSettings == true" ref="wifiSettings">
+      <div class="personal-wrapper">
+        <div class="wrapper__title">Personal Hotspot</div>
+        <ul class="wifi__list">
+          <li class="wifi__item">
+            <div class="wifi-item__name">
+              <img src="@/assets/img/hotspot.svg" alt="" />
+              Nikita
+            </div>
+            <div class="wifi-item__status">
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <rect x="1" y="14" width="4" height="5" rx="1" fill="#86868B" />
+                <rect x="7" y="11" width="4" height="8" rx="1" fill="#86868B" />
+                <rect
+                  x="13"
+                  y="8"
+                  width="4"
+                  height="11"
+                  rx="1"
+                  fill="#D9D9D9"
+                />
+                <rect
+                  x="19"
+                  y="5"
+                  width="4"
+                  height="14"
+                  rx="1"
+                  fill="#D9D9D9"
+                />
+              </svg>
+              LTE
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="known-wrapper">
+        <div class="wrapper__title">Known Networks</div>
+        <ul class="wifi__list">
+          <li
+            class="wifi__item"
+            v-for="network in $store.getters.availableNetworks"
+            :key="network.name"
+            :class="[
+              $store.getters.activeNetwork &&
+              $store.getters.activeNetwork.name == network.name
+                ? 'active'
+                : '',
+            ]"
+            @click="connectToNetwork(network)"
+          >
+            <div class="wifi-item__name">
+              <svg
+                v-if="isConnecting !== network"
+                width="12"
+                height="12"
+                viewBox="0 0 12 12"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M9.91747 4.89353C10.1818 5.14127 10.5911 5.12133 10.8316 4.84893C11.0721 4.5766 11.0527 4.15493 10.7883 3.9072L9.91747 4.89353ZM1.21168 3.9072C0.947306 4.15493 0.927938 4.5766 1.16841 4.84893C1.4089 5.12133 1.81816 5.14127 2.08253 4.89353L1.21168 3.9072ZM5.99999 3.33333C7.50896 3.33333 8.88256 3.92367 9.91747 4.89353L10.7883 3.9072C9.52448 2.7228 7.84338 2 5.99999 2V3.33333ZM2.08253 4.89353C3.11745 3.92367 4.49106 3.33333 5.99999 3.33333V2C4.15658 2 2.47553 2.7228 1.21168 3.9072L2.08253 4.89353Z"
+                  fill="#1F1F20"
+                />
+                <path
+                  d="M7.74034 7.36016C8.00475 7.6079 8.41398 7.58796 8.65444 7.31563C8.89496 7.04323 8.87555 6.62163 8.61121 6.37383L7.74034 7.36016ZM3.38746 6.37383C3.12309 6.62163 3.10372 7.04323 3.34419 7.31563C3.58468 7.58796 3.99394 7.6079 4.25831 7.36016L3.38746 6.37383ZM5.99932 6.66683C6.67017 6.66683 7.28013 6.9289 7.74034 7.36016L8.61121 6.37383C7.92205 5.72803 7.00466 5.3335 5.99932 5.3335V6.66683ZM4.25831 7.36016C4.71852 6.9289 5.32847 6.66683 5.99932 6.66683V5.3335C4.99399 5.3335 4.07661 5.72803 3.38746 6.37383L4.25831 7.36016Z"
+                  fill="#1F1F20"
+                />
+                <path
+                  d="M5.99866 8.6665C5.64127 8.6665 5.35156 8.96497 5.35156 9.33317C5.35156 9.70137 5.64127 9.99984 5.99866 9.99984V8.6665ZM6.00513 9.99984C6.36253 9.99984 6.65223 9.70137 6.65223 9.33317C6.65223 8.96497 6.36253 8.6665 6.00513 8.6665V9.99984ZM5.99866 9.99984H6.00513V8.6665H5.99866V9.99984Z"
+                  fill="#1F1F20"
+                />
+              </svg>
+              <svg
+                v-if="isConnecting == network"
+                xmlns="http://www.w3.org/2000/svg"
+                xmlns:xlink="http://www.w3.org/1999/xlink"
+                style="margin: auto; display: block; shape-rendering: auto"
+                width="200px"
+                height="200px"
+                viewBox="0 0 100 100"
+                preserveAspectRatio="xMidYMid"
+              >
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="32"
+                  stroke-width="8"
+                  stroke="#14121f"
+                  stroke-dasharray="50.26548245743669 50.26548245743669"
+                  fill="none"
+                  stroke-linecap="round"
+                >
+                  <animateTransform
+                    attributeName="transform"
+                    type="rotate"
+                    dur="1s"
+                    repeatCount="indefinite"
+                    keyTimes="0;1"
+                    values="0 50 50;360 50 50"
+                  ></animateTransform>
+                </circle>
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="23"
+                  stroke-width="8"
+                  stroke="#14121f"
+                  stroke-dasharray="36.12831551628262 36.12831551628262"
+                  stroke-dashoffset="36.12831551628262"
+                  fill="none"
+                  stroke-linecap="round"
+                >
+                  <animateTransform
+                    attributeName="transform"
+                    type="rotate"
+                    dur="1s"
+                    repeatCount="indefinite"
+                    keyTimes="0;1"
+                    values="0 50 50;-360 50 50"
+                  ></animateTransform>
+                </circle>
+              </svg>
+
+              {{ network.name }}
+            </div>
+
+            <div class="wifi-item__status">
+              <img src="@/assets/img/wifi-lock.svg" alt="" />
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div class="network-btn" @click="addNetwork">Add network</div>
     </div>
+
     <div class="error-message" v-if="showError && !$v.name.minLength && !phone">
       Name must have at least {{ $v.name.$params.minLength.min }} letters.
     </div>
-
     <div class="error-message" v-if="showError && !$v.name.required && !phone">
       {{ defaultErrorText }}
     </div>
@@ -113,6 +222,7 @@ export default {
     defaultName: {
       type: String,
       required: false,
+      default: '',
     },
     defaultNameTime: {
       type: Object,
@@ -176,21 +286,15 @@ export default {
   },
   data() {
     return {
-      name: this.defaultName ? this.defaultName : '',
+      name: this.defaultName,
       isValid: false,
       showError: false,
       active: false,
       baseFile: '',
       showPasswordIcon: false,
+      wifiSettings: false,
+      isConnecting: null,
     }
-  },
-  watch: {
-    defaultName() {
-      this.name = this.defaultName
-      this.resetValidation()
-      this.focus()
-      this.sendData()
-    },
   },
   components: {
     VueTimepicker,
@@ -226,7 +330,14 @@ export default {
     this.focus()
     this.sendData()
   },
-
+  watch: {
+    defaultName() {
+      this.name = this.defaultName
+      this.resetValidation()
+      this.focus()
+      this.sendData()
+    },
+  },
   methods: {
     checkValidation() {
       if (this.$v) {
@@ -304,6 +415,56 @@ export default {
         return
       }
       this.$emit('getData', this.placeholderText, this.name)
+    },
+    toggleWifiSettings() {
+      this.wifiSettings = !this.wifiSettings
+      console.log('wifi settings toggled:', this.wifiSettings)
+
+      setTimeout(() => {
+        if (this.wifiSettings) {
+          // Проверка, существует ли обработчик, и удаление его, если нужно
+          if (this.documentClickHandler) {
+            window.removeEventListener('click', this.documentClickHandler)
+          }
+
+          this.documentClickHandler = (e) => {
+            if (
+              this.$refs.wifiSettings &&
+              !this.$refs.wifiSettings.contains(e.target)
+            ) {
+              this.wifiSettings = false
+              window.removeEventListener('click', this.documentClickHandler)
+              this.documentClickHandler = null
+              console.log('Clicked outside, wifi settings closed.')
+            }
+          }
+
+          window.addEventListener('click', this.documentClickHandler)
+        } else {
+          // Удаление обработчика событий, если настройки закрываются
+          if (this.documentClickHandler) {
+            window.removeEventListener('click', this.documentClickHandler)
+            this.documentClickHandler = null
+          }
+        }
+      }, 500)
+    },
+    connectToNetwork(network) {
+      this.isConnecting = network
+      document.body.style.pointerEvents = 'none'
+      setTimeout(() => {
+        this.name = network.name
+        this.isConnecting = false
+        this.$store.commit('setActiveNetwork', network)
+        document.body.style.pointerEvents = 'unset'
+      }, 2000)
+    },
+    addNetwork() {
+      this.$refs.input.focus()
+      this.$emit('addNetwork')
+    },
+    clearNetwork() {
+      this.$emit('clearNetwork')
     },
     clearField() {
       this.name = ''
@@ -406,13 +567,23 @@ export default {
     row-gap: 0;
   }
   .deletable {
-    width: rem(52px);
-    height: 100%;
+    position: absolute;
+    top: 0.375rem;
+    right: rem(50px);
+    width: 2.5rem;
+    height: 2.5rem;
+    transition: all 0.3s ease;
+    border-radius: 0.625rem;
     display: flex;
     align-items: center;
     justify-content: center;
     img {
       cursor: pointer;
+      transition: all 0.2s ease;
+      &:hover {
+        transition: all 0.2s ease;
+        opacity: 0.8;
+      }
     }
   }
   .show-password {
@@ -577,6 +748,114 @@ export default {
 //   }
 // }
 //
+
+.wifi-settings {
+  position: absolute;
+  top: 100%;
+  right: 0%;
+  z-index: 100;
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0px 12px 24px 0px #0000001f;
+  width: rem(320px);
+  border-radius: rem(30px);
+  padding: rem(31px);
+  display: flex;
+  flex-direction: column;
+  gap: rem(17px);
+  .personal-wrapper {
+    border-bottom: 1px solid #f5f5f8;
+    padding-bottom: rem(17px);
+  }
+  .personal-wrapper,
+  .known-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: rem(12px);
+    .wrapper__title {
+      color: #86868b;
+      font-size: rem(14px);
+      line-height: rem(21px);
+      font-weight: 500;
+    }
+    .wifi__list {
+      display: flex;
+      flex-direction: column;
+      gap: rem(12px);
+      list-style: none;
+      .wifi__item {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+
+        .wifi-item__name {
+          display: flex;
+          flex-direction: row;
+          gap: rem(8px);
+          align-items: center;
+          font-weight: 700;
+          font-size: rem(17px);
+          line-height: rem(21px);
+          letter-spacing: -0.02em;
+          color: #14121f;
+          svg {
+            height: rem(24px);
+            width: rem(24px);
+            padding: rem(6px);
+            background: #86868b29;
+            border-radius: 50%;
+          }
+          img {
+            padding: rem(6px);
+            background: #86868b29;
+            border-radius: 50%;
+          }
+        }
+        &.active {
+          svg {
+            path {
+              fill: #fff;
+            }
+            background: #0071e2;
+          }
+        }
+        .wifi-item__status {
+          display: flex;
+          flex-direction: row;
+          gap: rem(8px);
+          align-items: center;
+          font-weight: 700;
+          font-size: rem(17px);
+          line-height: rem(21px);
+          letter-spacing: -0.02em;
+          color: #86868b;
+        }
+      }
+    }
+  }
+  .network-btn {
+    font-size: rem(14px);
+    line-height: rem(21px);
+    font-weight: 700;
+    color: rgba(255, 255, 255, 1);
+    background: rgba(0, 113, 226, 1);
+    border-radius: rem(999px);
+    padding: rem(7px) rem(17px) rem(8px) rem(17px);
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    border: 1px solid transparent;
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+}
 
 @media (max-width: 670px) {
   .input-wrapper.deletable {
