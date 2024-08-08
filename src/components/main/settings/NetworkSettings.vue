@@ -13,7 +13,11 @@
       <div class="network-settings-item">
         <div class="item-name">Network name</div>
         <div class="item-value">
-          {{ this.formSettings.network.wifi.ssid }}
+          {{
+            this.$store.getters.activeNetwork
+              ? this.$store.getters.activeNetwork.network.wifi.ssid
+              : this.formSettings.network.wifi.ssid
+          }}
         </div>
       </div>
       <div class="network-settings-item">
@@ -23,7 +27,11 @@
       <div class="network-settings-item">
         <div class="item-name">IP Address</div>
         <div class="item-value">
-          {{ this.formSettings.network.wifi.ipv4.address }}
+          {{
+            this.$store.getters.activeNetwork
+              ? this.$store.getters.activeNetwork.network.wifi.ipv4.address
+              : this.formSettings.network.wifi.ipv4.address
+          }}
         </div>
       </div>
       <div class="network-settings-item">
@@ -37,13 +45,21 @@
       <div class="network-settings-item">
         <div class="item-name">Network frequency</div>
         <div class="item-value">
-          {{ this.formSettings.network.wifi.Frequency }}
+          {{
+            this.$store.getters.activeNetwork
+              ? this.$store.getters.activeNetwork.network.wifi.Frequency
+              : this.formSettings.network.wifi.Frequency
+          }}
         </div>
       </div>
       <div class="network-settings-item">
         <div class="item-name">Hidden network</div>
         <div class="item-value">
-          {{ this.formSettings.network.wifi.hidden }}
+          {{
+            this.$store.getters.activeNetwork
+              ? this.$store.getters.activeNetwork.network.wifi.hidden
+              : this.formSettings.network.wifi.hidden
+          }}
         </div>
       </div>
     </div>

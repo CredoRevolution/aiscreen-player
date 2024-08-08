@@ -214,6 +214,7 @@ export default {
   watch: {
     defaultValue: {
       handler(newValue) {
+        if (this.isUserSelected) return
         if (!this.isUserSelected) {
           this.value = newValue
           this.checkLabel()

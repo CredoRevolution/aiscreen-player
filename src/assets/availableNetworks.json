@@ -5,9 +5,15 @@
         "ssid": "wifi1",
         "ip": "192.168.0.1",
         "mac": "00:00:00:00:00:01",
-        "Frequency": 2.4,
+        "Frequency": "2.4gHz",
         "Authentication": "Basic (WPA2 Personal)",
-        "password": "12345678"
+        "password": "12345678",
+        "hidden": false,
+        "ipv4": {
+          "method": "manual",
+          "gateway": "189.110.10.199",
+          "address": "089.600.600.600"
+        }
       }
     }
   },
@@ -17,8 +23,14 @@
         "ssid": "wifi2",
         "ip": "192.168.0.2",
         "mac": "00:00:00:00:00:02",
-        "Frequency": 5.6,
-        "Authentication": "None"
+        "Frequency": "5.6gHz",
+        "Authentication": "None",
+        "hidden": false,
+        "ipv4": {
+          "method": "manual",
+          "gateway": "189.116.16.169",
+          "address": "089.660.660.660"
+        }
       }
     }
   }

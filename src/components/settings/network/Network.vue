@@ -32,7 +32,9 @@
           :optionsCount="networkFrequencies"
           :defaultValue="
             $store.getters.activeNetwork
-              ? { name: $store.getters.activeNetwork.frequency + 'gHz' }
+              ? {
+                  name: $store.getters.activeNetwork.network.wifi.Frequency,
+                }
               : { name: '2.4gHz' }
           "
           :search="false"
@@ -53,7 +55,8 @@
           :defaultValue="
             $store.getters.activeNetwork
               ? {
-                  name: $store.getters.activeNetwork.authentication,
+                  name: $store.getters.activeNetwork.network.wifi
+                    .Authentication,
                 }
               : { name: 'None' }
           "
@@ -80,9 +83,9 @@
           :inputName="'Password'"
           :defaultName="
             $store.getters.activeNetwork &&
-            $store.getters.activeNetwork.authentication ===
+            $store.getters.activeNetwork.network.wifi.Authentication ===
               'Basic (WPA2 Personal)'
-              ? $store.getters.activeNetwork.password
+              ? $store.getters.activeNetwork.network.wifi.password
               : ''
           "
           @getData="getData"
@@ -438,6 +441,11 @@ export default {
       },
       deep: true,
     },
+    creatingNewNetwork: {
+      handler() {
+        console.log('creatingNewNetwork', this.creatingNewNetwork)
+      },
+    },
   },
 
   methods: {
@@ -629,24 +637,80 @@ export default {
       if (this.creatingNewNetwork) {
         console.log('creating new network')
         if (this.checkAllValidations()) {
-          const availableNetworks =
-            this.$store.getters.availableNetworks.slice() // Клонируем массив, чтобы не изменять оригинальный
-          availableNetworks.push(this.form) // Добавляем новую сеть
-          console.log(availableNetworks) // Выводим обновленный массив
-          this.$store.commit('setAvailableNetworks', availableNetworks) // Передаем обновленный массив в коммит
-          console.log(this.$store.getters.availableNetworks) // Выводим доступные сети из хранилища
+          const newNetwork = JSON.parse(JSON.stringify(this.cleanForm())) // Глубокое копирование объекта form
+          this.$store.commit('setNewNetwork', newNetwork) // Сохраняем новую сеть во временное состояние
+          console.log(this.$store.getters.newNetwork) // Выводим новую сеть
+          this.creatingNewNetwork = false // Устанавливаем в false после успешного сохранения
         }
-        this.creatingNewNetwork = false
+      }
+
+      if (this.$store.getters.newNetwork) {
+        const newNetwork = this.$store.getters.newNetwork
+        const availableNetworks = this.$store.getters.availableNetworks.slice() // Клонируем массив, чтобы не изменять оригинальный
+        availableNetworks.push(newNetwork) // Добавляем новую сеть
+        console.log(availableNetworks) // Выводим обновленный массив
+
+        this.$store.commit('setAvailableNetworks', availableNetworks) // Передаем обновленный массив в коммит
+        this.$store.commit('setActiveNetwork', newNetwork) // Устанавливаем новую сеть активной
+        this.$store.commit('setNewNetwork', null) // Очищаем временное состояние newNetwork
+        console.log(this.$store.getters.availableNetworks) // Выводим доступные сети из хранилища
+        console.log(this.$store.getters.activeNetwork) // Выводим активную сеть
+
+        // Сбрасываем form после добавления новой сети
+        this.form = {
+          version: '1.0.0',
+          network: {
+            wifi: {
+              ssid: '',
+              hidden: false,
+              password: '',
+              Authentification: '',
+              Frequency: '',
+              Network: '',
+              enterprise: {
+                mode: '',
+                identity: '',
+                private_key_password: '',
+                ca_cert: '',
+                private_key: '',
+                client_cert: '',
+              },
+              dns: [],
+              ipv4: {
+                method: '',
+                gateway: '',
+                address: '',
+              },
+            },
+            ethernet: {
+              dns: [],
+              ipv4: {
+                method: '',
+                gateway: '',
+                address: '',
+              },
+            },
+          },
+          proxy: {
+            server: {
+              address: '',
+              port: Number,
+            },
+          },
+          ntp: [],
+          trust_certificates: [],
+        }
       }
 
       if (this.checkAllValidations()) {
         this.$emit('saveSettings', this.form)
       }
     },
+
     addNetwork() {
+      this.creatingNewNetwork = true
       this.clearNetwork()
       this.$refs.validation01._data.active = true
-      this.creatingNewNetwork = true
     },
     clearNetwork() {
       const fields = [
