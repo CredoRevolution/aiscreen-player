@@ -454,6 +454,7 @@ export default {
   },
 
   methods: {
+    // Проверяет все валидации и возвращает true, если все проверки пройдены
     checkAllValidations() {
       this.validationCount = 0
       const validations = [
@@ -485,94 +486,98 @@ export default {
           this.validationCount++
         }
       })
+
       if (this.$refs.advancedSettings.checkAllValidations()) {
         if (this.validationCount === visibleValidations) {
           return true
         }
       }
     },
+
+    // Устанавливает данные в форму
     getData(formPlace, formField, selectedValue) {
+      const setValue =
+        typeof selectedValue === 'boolean'
+          ? selectedValue
+          : selectedValue.trim()
+
       if (formPlace) {
         let formObj = this.form
-        for (let i = 0; i < formPlace.length; i++) {
-          formObj = formObj[formPlace[i]]
-        }
-        if (typeof selectedValue === 'boolean') {
-          formObj[formField] = selectedValue
-        } else {
-          formObj[formField] = selectedValue.trim()
-        }
-
-        return
-      }
-      if (typeof selectedValue === 'boolean') {
-        this.form[formField] = selectedValue
+        formPlace.forEach((place) => (formObj = formObj[place]))
+        formObj[formField] = setValue
       } else {
-        this.form[formField] = selectedValue.trim()
+        this.form[formField] = setValue
       }
     },
+
+    // Обновляет данные формы в зависимости от выбранной вкладки
     getAdvancedForm(form, selectedTab) {
-      if (selectedTab === '') {
+      if (!selectedTab) {
         console.log('нет активной вкладки')
         return
       }
-      if (
-        selectedTab &&
-        selectedTab.trim() == 'IP Address' &&
-        this.selectedTab == 'Ethernet'
-      ) {
-        this.form.network.ethernet.ipv4 = {
-          ...form.ipv4,
+
+      const tabMapping = {
+        'IP Address': {
+          Ethernet: () => {
+            if (!this.form.network.ethernet) {
+              this.form.network.ethernet = {}
+            }
+            this.form.network.ethernet.ipv4 = { ...form.ipv4 }
+          },
+          'Wi-Fi': () => {
+            this.form.network.wifi.ipv4 = { ...form.ipv4 }
+          },
+        },
+        DNS: {
+          'Wi-Fi': () => {
+            this.form.network.wifi.dns = [...form.dns]
+          },
+          Ethernet: () => {
+            if (!this.form.network.ethernet) {
+              this.form.network.ethernet = {}
+            }
+            this.form.network.ethernet.dns = [...form.dns]
+          },
+        },
+        Proxy: () => {
+          this.form.proxy = { ...form.proxy }
+        },
+        NTP: () => {
+          this.form.ntp = [...form.ntp]
+        },
+        'Trusted Site’s Certificates': () => {
+          this.form.trust_certificates = [...form.trust_certificates]
+        },
+      }
+
+      const action = tabMapping[selectedTab.trim()]
+      if (action) {
+        if (typeof action === 'function') {
+          action()
+        } else {
+          action[this.selectedTab]()
         }
-      }
-      if (
-        selectedTab &&
-        selectedTab.trim() == 'IP Address' &&
-        this.selectedTab == 'Wi-Fi'
-      ) {
-        this.form.network.wifi.ipv4 = {
-          ...form.ipv4,
-        }
-      }
-      if (
-        selectedTab &&
-        selectedTab.trim() == 'DNS' &&
-        this.selectedTab == 'Wi-Fi'
-      ) {
-        this.form.network.wifi.dns = [...form.dns]
-      }
-      if (
-        selectedTab &&
-        selectedTab.trim() == 'DNS' &&
-        this.selectedTab == 'Ethernet'
-      ) {
-        this.form.network.ethernet.dns = [...form.dns]
-      }
-      if (selectedTab && selectedTab.trim() == 'Proxy') {
-        this.form.proxy = {
-          ...form.proxy,
-        }
-      }
-      if (selectedTab && selectedTab.trim() == 'NTP') {
-        this.form.ntp = [...form.ntp]
-      }
-      if (selectedTab && selectedTab.trim() == 'Trusted Site’s Certificates') {
-        this.form.trust_certificates = [...form.trust_certificates]
       }
     },
+
+    // Удаляет пустые и неиспользуемые поля из формы
     cleanForm() {
       const cleanedForm = JSON.parse(
-        JSON.stringify(this.form, (key, value) =>
-          value == null ||
-          value === '' ||
-          (Array.isArray(value) &&
-            value.filter((item) => item !== null).length === 0) ||
-          (typeof value === 'object' &&
-            value !== null &&
-            Object.keys(value).length === 0)
-            ? undefined
-            : value
-        ),
+        JSON.stringify(this.form, (key, value) => {
+          if (
+            value == null ||
+            value === '' ||
+            (Array.isArray(value) &&
+              value.filter((item) => item !== null).length === 0) ||
+            (typeof value === 'object' &&
+              value !== null &&
+              Object.keys(value).length === 0)
+          ) {
+            return undefined
+          }
+          return value
+        }),
         (key, value) => {
           if (
             value === null ||
@@ -627,23 +632,79 @@ export default {
       )
       return cleanedForm
     },
+
+    // Устанавливает значение скрытого поля Wi-Fi
     getToggleData(data) {
       this.form.network.wifi.hidden = data.value
     },
+
+    // Обновляет выбранную вкладку
     getDataTabs(tab) {
       if (tab) {
         this.selectedTab = tab.textContent.trim()
       }
     },
+
+    // Отправляет данные формы
     sendFormData() {
       this.$emit('sendFormData', this.form)
     },
+
+    // Создает новую сеть
+    createNewNetwork() {
+      this.clearNetwork()
+      this.creatingNewNetwork = true
+      this.$refs.validation01._data.active = true
+      this.resetForm()
+    },
+
+    // Сохраняет настройки сети
+    saveSettings() {
+      if (this.checkAllValidations()) {
+        const formCopy = JSON.parse(JSON.stringify(this.form))
+        const store = this.$store
+        if (this.creatingNewNetwork) {
+          this.addNewNetwork(formCopy, store)
+        } else {
+          this.editNetwork(formCopy, store)
+        }
+      }
+    },
+    addNewNetwork(formCopy, store) {
+      formCopy.id = Date.now()
+      const availableNetworks = store.getters.availableNetworks.slice()
+      availableNetworks.push(formCopy)
+      store.commit('setAvailableNetworks', availableNetworks)
+      store.commit('setActiveNetwork', formCopy)
+      this.creatingNewNetwork = false
+      console.log(this.cleanForm())
+      this.$emit('saveSettings', this.cleanForm())
+    },
+    editNetwork(formCopy, store) {
+      const availableNetworks = store.getters.availableNetworks.slice()
+      const index = availableNetworks.findIndex(
+        (network) => network.id === store.getters.activeNetwork.id
+      )
+      if (index !== -1) {
+        availableNetworks[index] = formCopy
+        store.commit('setAvailableNetworks', availableNetworks)
+        store.commit('setActiveNetwork', formCopy)
+      } else {
+        console.error('Active network not found in available networks.')
+      }
+      console.log(this.cleanForm())
+      this.$emit('saveSettings', this.cleanForm())
+    },
+
+    // Загружает активную сеть при изменении
+    onActiveNetworkChanged() {
+      this.loadActiveNetwork()
+    },
+    // Загружает активную сеть
     loadActiveNetwork() {
       const activeNetwork = this.activeNetwork
       if (activeNetwork) {
         this.form = JSON.parse(JSON.stringify(activeNetwork))
-
-        // Убедитесь, что все вложенные объекты инициализированы
         if (!this.form.network.wifi.enterprise) {
           this.form.network.wifi.enterprise = {
             mode: '',
@@ -656,78 +717,27 @@ export default {
         }
       }
     },
+    // Очищает поля формы
+    clearNetwork() {
+      const fields = [
+        'validation01',
+        'validation2',
+        'validation3',
+        'validation4',
+        'validation5',
+        'validation6',
+        'validation7',
+        'validation8',
+        'validation9',
+        'validation10',
+        'validation11',
+        'validation12',
+        'validation13',
+      ].map((ref) => this.$refs[ref])
 
-    saveSettings() {
-      if (this.creatingNewNetwork) {
-        console.log('Creating new network')
-
-        if (this.checkAllValidations()) {
-          const newNetwork = JSON.parse(JSON.stringify(this.form)) // Копируем данные формы
-          newNetwork.id = Date.now() // Генерируем уникальный ID для новой сети
-
-          const availableNetworks =
-            this.$store.getters.availableNetworks.slice()
-          availableNetworks.push(newNetwork)
-
-          this.$store.commit('setAvailableNetworks', availableNetworks) // Сохраняем новую сеть
-          this.$store.commit('setActiveNetwork', newNetwork) // Устанавливаем новую сеть активной
-
-          console.log(
-            'New network created:',
-            this.$store.getters.availableNetworks
-          )
-          console.log('Active network:', this.$store.getters.activeNetwork)
-
-          this.creatingNewNetwork = false // Сбрасываем флаг создания новой сети
-        }
-      } else {
-        console.log('Editing existing network')
-
-        if (this.checkAllValidations()) {
-          const editedNetwork = JSON.parse(JSON.stringify(this.form)) // Копируем данные формы
-
-          const availableNetworks =
-            this.$store.getters.availableNetworks.slice()
-          const existingNetworkIndex = availableNetworks.findIndex(
-            (network) => network.id === this.$store.getters.activeNetwork.id
-          )
-
-          if (existingNetworkIndex !== -1) {
-            availableNetworks[existingNetworkIndex] = editedNetwork
-
-            this.$store.commit('setAvailableNetworks', availableNetworks) // Обновляем список сетей
-            this.$store.commit('setActiveNetwork', editedNetwork) // Устанавливаем обновленную сеть активной
-
-            console.log(
-              'Network updated:',
-              this.$store.getters.availableNetworks
-            )
-            console.log('Active network:', this.$store.getters.activeNetwork)
-          } else {
-            console.error('Active network not found in available networks.')
-          }
-        }
-      }
-
-      if (this.checkAllValidations()) {
-        this.$emit('saveSettings', this.form) // Сохраняем настройки
-      }
+      fields.forEach((field) => field?.clearField())
     },
-
-    // Вызовите этот метод при выборе активной сети
-    onActiveNetworkChanged() {
-      this.loadActiveNetwork()
-    },
-
-    // Вызовите этот метод при создании новой сети
-    createNewNetwork() {
-      console.log('createNewNetwork')
-      this.clearNetwork()
-      this.creatingNewNetwork = true
-      this.$refs.validation01._data.active = true
-      this.resetForm()
-    },
-
+    // Сбрасывает форму
     resetForm() {
       this.form = {
         version: '1.0.0',
@@ -773,27 +783,8 @@ export default {
         trust_certificates: [],
       }
     },
-    clearNetwork() {
-      const fields = [
-        this.$refs.validation01,
-        this.$refs.validation2,
-        this.$refs.validation3,
-        this.$refs.validation4,
-        this.$refs.validation5,
-        this.$refs.validation6,
-        this.$refs.validation7,
-        this.$refs.validation8,
-        this.$refs.validation9,
-        this.$refs.validation10,
-        this.$refs.validation11,
-        this.$refs.validation12,
-        this.$refs.validation13,
-      ]
-      fields.forEach((field) => {
-        field.clearField()
-      })
-    },
   },
+
   mounted() {
     this.guestedTimezone = moment.tz.guess()
     this.timezone = moment.tz.names().map((name) => ({ name }))

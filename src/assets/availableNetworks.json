@@ -10,7 +10,7 @@
         "password": "12345678",
         "hidden": false,
         "ipv4": {
-          "method": "manual",
+          "method": "Manual (Static IP)",
           "gateway": "189.110.10.199",
           "address": "089.600.600.600"
         }

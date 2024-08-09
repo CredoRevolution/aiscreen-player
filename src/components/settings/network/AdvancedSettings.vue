@@ -24,7 +24,11 @@
           :defaultErrorText="'Option is required'"
           :form-field="'method'"
           :formPlace="['ipv4']"
-          :defaultValue="{ name: 'Manual (Static IP)' }"
+          :defaultValue="
+            activeNetwork && activeNetwork.network.wifi.ipv4.method
+              ? { name: activeNetwork.network.wifi.ipv4.method }
+              : { name: '' }
+          "
           @getData="getData"
           ref="validation1"
         />
@@ -35,7 +39,11 @@
           :formPlace="['ipv4']"
           :input-name="'IP'"
           :form-field="'address'"
-          :defaultName="'089.000.000.000'"
+          :defaultName="
+            activeNetwork && activeNetwork.network.wifi.ipv4.address
+              ? activeNetwork.network.wifi.ipv4.address
+              : ''
+          "
           :mask="'###.###.###.###'"
           @getData="getData"
           ref="validation2"
@@ -48,7 +56,11 @@
           :form-field="'gateway'"
           :input-name="'gateway'"
           :mask="'###.###.###.###'"
-          :defaultName="'089.100.100.100'"
+          :defaultName="
+            activeNetwork && activeNetwork.network.wifi.ipv4.gateway
+              ? activeNetwork.network.wifi.ipv4.gateway
+              : ''
+          "
           @getData="getData"
           ref="validation3"
           :required="form.ipv4.address !== ''"
@@ -182,6 +194,11 @@ export default {
       NTPAmount: 1,
       SitesCertificatesAmount: 1,
     }
+  },
+  computed: {
+    activeNetwork() {
+      return this.$store.getters.activeNetwork
+    },
   },
   components: { CustomTabs, SearchSelect, CustomInput },
   methods: {

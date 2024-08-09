@@ -117,7 +117,6 @@ export default {
       },
     },
   },
-
   methods: {
     checkValidation() {
       if (this.$v) {
@@ -214,7 +213,7 @@ export default {
   watch: {
     defaultValue: {
       handler(newValue) {
-        if (this.isUserSelected) return
+        if (this.isUserSelected && this.value.name === newValue.name) return
         if (!this.isUserSelected) {
           this.value = newValue
           this.checkLabel()

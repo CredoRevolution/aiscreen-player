@@ -419,7 +419,6 @@ export default {
     },
     toggleWifiSettings() {
       this.wifiSettings = !this.wifiSettings
-      console.log('wifi settings toggled:', this.wifiSettings)
 
       setTimeout(() => {
         if (this.wifiSettings) {
@@ -436,7 +435,6 @@ export default {
               this.wifiSettings = false
               window.removeEventListener('click', this.documentClickHandler)
               this.documentClickHandler = null
-              console.log('Clicked outside, wifi settings closed.')
             }
           }
 

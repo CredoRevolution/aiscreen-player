@@ -28,7 +28,8 @@
         <div class="item-name">IP Address</div>
         <div class="item-value">
           {{
-            this.$store.getters.activeNetwork
+            this.$store.getters.activeNetwork &&
+            this.$store.getters.activeNetwork.network.wifi.ipv4
               ? this.$store.getters.activeNetwork.network.wifi.ipv4.address
               : this.formSettings.network.wifi.ipv4.address
           }}

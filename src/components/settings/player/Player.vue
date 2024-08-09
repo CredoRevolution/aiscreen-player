@@ -192,7 +192,6 @@ export default {
         ...this.playerData,
         formattedDays: this.formattedDays,
       }
-      console.log('Player data sent:', playerDataWithFormattedDays)
       this.$emit('sendPlayerData', playerDataWithFormattedDays)
     },
   },
