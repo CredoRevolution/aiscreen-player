@@ -1,15 +1,15 @@
 <template>
   <div id="app">
-    <PlayerSettings />
+    <ScreenSettings />
   </div>
 </template>
 
 <script>
-import PlayerSettings from './components/PlayerSettings.vue'
+import ScreenSettings from './components/ScreenSettings.vue'
 export default {
   name: 'App',
   components: {
-    PlayerSettings,
+    ScreenSettings,
   },
 }
 </script>

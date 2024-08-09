@@ -6,7 +6,7 @@
         "ip": "192.168.0.1",
         "mac": "00:00:00:00:00:01",
         "Frequency": "2.4gHz",
-        "Authentication": "Basic (WPA2 Personal)",
+        "Authentification": "Basic (WPA2 Personal)",
         "password": "12345678",
         "hidden": false,
         "ipv4": {
@@ -24,7 +24,7 @@
         "ip": "192.168.0.2",
         "mac": "00:00:00:00:00:02",
         "Frequency": "5.6gHz",
-        "Authentication": "None",
+        "Authentification": "None",
         "hidden": false,
         "ipv4": {
           "method": "manual",

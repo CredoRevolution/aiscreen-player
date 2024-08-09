@@ -88,6 +88,7 @@ export default {
   },
   mounted() {
     this.$store.commit('setAvailableNetworks', availableNetworks)
+    this.$store.commit('setActiveNetwork', availableNetworks[0])
     console.log(this.$store.getters.availableNetworks)
   },
 }

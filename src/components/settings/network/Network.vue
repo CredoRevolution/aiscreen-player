@@ -12,18 +12,14 @@
           v-show="selectedTab === 'Wi-Fi'"
           :placeholderText="'Network name (SSID)'"
           :defaultErrorText="'Network name (SSID) is required'"
-          :defaultName="
-            $store.getters.activeNetwork
-              ? $store.getters.activeNetwork.network.wifi.ssid
-              : 'aiscrern'
-          "
+          :defaultName="activeNetwork.network.wifi.ssid"
           :formField="'ssid'"
           :formPlace="['network', 'wifi']"
           :inputName="'ssid'"
           :required="selectedTab === 'Wi-Fi'"
           @getData="getData"
           @clearNetwork="clearNetwork"
-          @addNetwork="addNetwork"
+          @addNetwork="createNewNetwork"
           ref="validation01"
         />
         <SearchSelect
@@ -31,11 +27,11 @@
           v-show="selectedTab === 'Wi-Fi'"
           :optionsCount="networkFrequencies"
           :defaultValue="
-            $store.getters.activeNetwork
+            activeNetwork.network.wifi.Frequency
               ? {
-                  name: $store.getters.activeNetwork.network.wifi.Frequency,
+                  name: activeNetwork.network.wifi.Frequency,
                 }
-              : { name: '2.4gHz' }
+              : { name: '2.6gHz' }
           "
           :search="false"
           :defaultText="'Network frequency'"
@@ -53,10 +49,9 @@
           :defaultText="'Authentification'"
           :defaultErrorText="'Authentification is required'"
           :defaultValue="
-            $store.getters.activeNetwork
+            activeNetwork.network.wifi.Authentification
               ? {
-                  name: $store.getters.activeNetwork.network.wifi
-                    .Authentication,
+                  name: activeNetwork.network.wifi.Authentification,
                 }
               : { name: 'None' }
           "
@@ -82,10 +77,9 @@
           :formPlace="['network', 'wifi']"
           :inputName="'Password'"
           :defaultName="
-            $store.getters.activeNetwork &&
-            $store.getters.activeNetwork.network.wifi.Authentication ===
-              'Basic (WPA2 Personal)'
-              ? $store.getters.activeNetwork.network.wifi.password
+            activeNetwork.network.wifi.Authentification ===
+            'Basic (WPA2 Personal)'
+              ? activeNetwork.network.wifi.password
               : ''
           "
           @getData="getData"
@@ -429,6 +423,11 @@ export default {
       default: false,
     },
   },
+  computed: {
+    activeNetwork() {
+      return this.$store.getters.activeNetwork
+    },
+  },
   watch: {
     settings() {
       if (this.settings) {
@@ -441,6 +440,12 @@ export default {
       },
       deep: true,
     },
+    activeNetwork: {
+      handler() {
+        this.onActiveNetworkChanged()
+      },
+    },
+
     creatingNewNetwork: {
       handler() {
         console.log('creatingNewNetwork', this.creatingNewNetwork)
@@ -633,84 +638,140 @@ export default {
     sendFormData() {
       this.$emit('sendFormData', this.form)
     },
-    saveSettings() {
-      if (this.creatingNewNetwork) {
-        console.log('creating new network')
-        if (this.checkAllValidations()) {
-          const newNetwork = JSON.parse(JSON.stringify(this.cleanForm())) // Глубокое копирование объекта form
-          this.$store.commit('setNewNetwork', newNetwork) // Сохраняем новую сеть во временное состояние
-          console.log(this.$store.getters.newNetwork) // Выводим новую сеть
-          this.creatingNewNetwork = false // Устанавливаем в false после успешного сохранения
+    loadActiveNetwork() {
+      const activeNetwork = this.activeNetwork
+      if (activeNetwork) {
+        this.form = JSON.parse(JSON.stringify(activeNetwork))
+
+        // Убедитесь, что все вложенные объекты инициализированы
+        if (!this.form.network.wifi.enterprise) {
+          this.form.network.wifi.enterprise = {
+            mode: '',
+            identity: '',
+            private_key_password: '',
+            ca_cert: '',
+            private_key: '',
+            client_cert: '',
+          }
         }
       }
+    },
 
-      if (this.$store.getters.newNetwork) {
-        const newNetwork = this.$store.getters.newNetwork
-        const availableNetworks = this.$store.getters.availableNetworks.slice() // Клонируем массив, чтобы не изменять оригинальный
-        availableNetworks.push(newNetwork) // Добавляем новую сеть
-        console.log(availableNetworks) // Выводим обновленный массив
+    saveSettings() {
+      if (this.creatingNewNetwork) {
+        console.log('Creating new network')
 
-        this.$store.commit('setAvailableNetworks', availableNetworks) // Передаем обновленный массив в коммит
-        this.$store.commit('setActiveNetwork', newNetwork) // Устанавливаем новую сеть активной
-        this.$store.commit('setNewNetwork', null) // Очищаем временное состояние newNetwork
-        console.log(this.$store.getters.availableNetworks) // Выводим доступные сети из хранилища
-        console.log(this.$store.getters.activeNetwork) // Выводим активную сеть
+        if (this.checkAllValidations()) {
+          const newNetwork = JSON.parse(JSON.stringify(this.form)) // Копируем данные формы
+          newNetwork.id = Date.now() // Генерируем уникальный ID для новой сети
 
-        // Сбрасываем form после добавления новой сети
-        this.form = {
-          version: '1.0.0',
-          network: {
-            wifi: {
-              ssid: '',
-              hidden: false,
-              password: '',
-              Authentification: '',
-              Frequency: '',
-              Network: '',
-              enterprise: {
-                mode: '',
-                identity: '',
-                private_key_password: '',
-                ca_cert: '',
-                private_key: '',
-                client_cert: '',
-              },
-              dns: [],
-              ipv4: {
-                method: '',
-                gateway: '',
-                address: '',
-              },
-            },
-            ethernet: {
-              dns: [],
-              ipv4: {
-                method: '',
-                gateway: '',
-                address: '',
-              },
-            },
-          },
-          proxy: {
-            server: {
-              address: '',
-              port: Number,
-            },
-          },
-          ntp: [],
-          trust_certificates: [],
+          const availableNetworks =
+            this.$store.getters.availableNetworks.slice()
+          availableNetworks.push(newNetwork)
+
+          this.$store.commit('setAvailableNetworks', availableNetworks) // Сохраняем новую сеть
+          this.$store.commit('setActiveNetwork', newNetwork) // Устанавливаем новую сеть активной
+
+          console.log(
+            'New network created:',
+            this.$store.getters.availableNetworks
+          )
+          console.log('Active network:', this.$store.getters.activeNetwork)
+
+          this.creatingNewNetwork = false // Сбрасываем флаг создания новой сети
+        }
+      } else {
+        console.log('Editing existing network')
+
+        if (this.checkAllValidations()) {
+          const editedNetwork = JSON.parse(JSON.stringify(this.form)) // Копируем данные формы
+
+          const availableNetworks =
+            this.$store.getters.availableNetworks.slice()
+          const existingNetworkIndex = availableNetworks.findIndex(
+            (network) => network.id === this.$store.getters.activeNetwork.id
+          )
+
+          if (existingNetworkIndex !== -1) {
+            availableNetworks[existingNetworkIndex] = editedNetwork
+
+            this.$store.commit('setAvailableNetworks', availableNetworks) // Обновляем список сетей
+            this.$store.commit('setActiveNetwork', editedNetwork) // Устанавливаем обновленную сеть активной
+
+            console.log(
+              'Network updated:',
+              this.$store.getters.availableNetworks
+            )
+            console.log('Active network:', this.$store.getters.activeNetwork)
+          } else {
+            console.error('Active network not found in available networks.')
+          }
         }
       }
 
       if (this.checkAllValidations()) {
-        this.$emit('saveSettings', this.form)
+        this.$emit('saveSettings', this.form) // Сохраняем настройки
       }
     },
 
-    addNetwork() {
-      this.creatingNewNetwork = true
+    // Вызовите этот метод при выборе активной сети
+    onActiveNetworkChanged() {
+      this.loadActiveNetwork()
+    },
+
+    // Вызовите этот метод при создании новой сети
+    createNewNetwork() {
+      console.log('createNewNetwork')
       this.clearNetwork()
+      this.creatingNewNetwork = true
       this.$refs.validation01._data.active = true
+      this.resetForm()
+    },
+
+    resetForm() {
+      this.form = {
+        version: '1.0.0',
+        network: {
+          wifi: {
+            ssid: '',
+            hidden: false,
+            password: '',
+            Authentification: '',
+            Frequency: '',
+            Network: '',
+            enterprise: {
+              mode: '',
+              identity: '',
+              private_key_password: '',
+              ca_cert: '',
+              private_key: '',
+              client_cert: '',
+            },
+            dns: [],
+            ipv4: {
+              method: '',
+              gateway: '',
+              address: '',
+            },
+          },
+          ethernet: {
+            dns: [],
+            ipv4: {
+              method: '',
+              gateway: '',
+              address: '',
+            },
+          },
+        },
+        proxy: {
+          server: {
+            address: '',
+            port: null,
+          },
+        },
+        ntp: [],
+        trust_certificates: [],
+      }
     },
     clearNetwork() {
       const fields = [
@@ -736,7 +797,10 @@ export default {
   mounted() {
     this.guestedTimezone = moment.tz.guess()
     this.timezone = moment.tz.names().map((name) => ({ name }))
-    this.sendFormData()
+    setTimeout(() => {
+      this.loadActiveNetwork() // Загружаем активную сеть при инициализации
+      this.sendFormData()
+    }, 1000)
   },
 }
 </script>

@@ -296,8 +296,7 @@ export default {
     },
     sendData() {
       this.checkValidation()
-      if (this.baseFile) {
-      }
+
       if (this.formField) {
         this.$emit('getData', this.formPlace, this.formField, this.name)
 
