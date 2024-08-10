@@ -459,6 +459,7 @@ export default {
       }, 2000)
     },
     addNetwork() {
+      this.wifiSettings = false
       this.$refs.input.focus()
       this.$emit('addNetwork')
     },

@@ -213,14 +213,17 @@ export default {
   watch: {
     defaultValue: {
       handler(newValue) {
-        if (this.isUserSelected && this.value.name === newValue.name) return
+        console.log(this.isUserSelected)
+
+        if (this.isUserSelected) return
         if (!this.isUserSelected) {
           this.value = newValue
           this.checkLabel()
           this.showValue = true
           this.checkState()
         }
-        this.isUserSelected = false // Reset after handling
+
+        this.isUserSelected = false
       },
       deep: true,
     },

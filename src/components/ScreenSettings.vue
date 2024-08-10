@@ -82,11 +82,15 @@ export default {
     saveSettings(formData) {
       this.formSettings = formData
       this.settings = false
+      console.log('formSettings', this.formSettings)
+      console.log('playerSettings', this.playerSettings)
     },
   },
   mounted() {
     this.$store.commit('setAvailableNetworks', availableNetworks)
     this.$store.commit('setActiveNetwork', availableNetworks[0])
+    console.log('formSettings', this.formSettings)
+    console.log('playerSettings', this.playerSettings)
   },
 }
 </script>

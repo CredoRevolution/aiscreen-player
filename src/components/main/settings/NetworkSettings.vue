@@ -81,9 +81,7 @@ export default {
       required: true,
     },
   },
-  mounted() {
-    console.log(this.formSettings)
-  },
+  mounted() {},
 }
 </script>
 

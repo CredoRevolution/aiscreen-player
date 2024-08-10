@@ -15,7 +15,8 @@
           "address": "089.600.600.600"
         }
       }
-    }
+    },
+    "ntp": ["4324234", "4324234"]
   },
   {
     "network": {
@@ -26,11 +27,13 @@
         "Frequency": "5.6gHz",
         "Authentification": "None",
         "hidden": false,
-        "ipv4": {
-          "method": "manual",
-          "gateway": "189.116.16.169",
-          "address": "089.660.660.660"
-        }
+        "dns": ["89.207.132.170", "89.207.132.170"]
+      }
+    },
+    "proxy": {
+      "server": {
+        "address": "4324.32",
+        "port": "43242"
       }
     }
   }

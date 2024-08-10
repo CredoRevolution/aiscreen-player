@@ -335,6 +335,19 @@
       <div class="chanel-info-row">
         <div class="chanel-info-row-item">
           <div class="chanel-info-title-wrapper">
+            <div class="chanel-info-title">Timezone</div>
+            <div class="chanel-info-title">
+              {{ currentTime }}
+            </div>
+          </div>
+          <div class="chanel-info-value chanel-info-value__location">
+            {{ currentTimezone }}
+          </div>
+        </div>
+      </div>
+      <div class="chanel-info-row">
+        <div class="chanel-info-row-item">
+          <div class="chanel-info-title-wrapper">
             <div class="chanel-info-title">Location</div>
             <div class="chanel-info-title">
               {{ playerSettings.locationTime }}
@@ -345,7 +358,19 @@
           </div>
         </div>
       </div>
+      <div class="chanel-info-row chanel-info-row_select">
+        <SearchSelect
+          :optionsCount="OperatingHours"
+          :search="false"
+          :defaultText="'Operating hours'"
+          :defaultErrorText="'Operating hours is required'"
+          :defaultValue="{ name: 'Use space’s hours' }"
+          @getData="getData"
+          ref="OperatingHours"
+        />
+      </div>
     </div>
+
     <NetworkSettings :formSettings="formSettings" />
   </div>
 </template>
@@ -390,6 +415,14 @@ export default {
       wifiSettings: false,
       documentClickHandler: null,
       isConnecting: null,
+      OperatingHours: [
+        {
+          name: 'Use space’s hours',
+        },
+        {
+          name: 'Use custom hours',
+        },
+      ],
     }
   },
   computed: {
@@ -401,6 +434,14 @@ export default {
       const hours = duration.hours()
       const minutes = duration.minutes()
       return `${days}d ${hours}h ${minutes}min`
+    },
+    currentTimezone() {
+      const timezone = moment.tz.guess()
+      const offset = moment().tz(timezone).format('Z')
+      return `UTC${offset} (${timezone})`
+    },
+    currentTime() {
+      return moment().format('h:mmA')
     },
   },
 
@@ -818,6 +859,10 @@ export default {
       justify-content: space-between;
       gap: rem(17px);
       width: 100%;
+      &_select {
+        width: 100%;
+        display: unset;
+      }
       &_graph {
       }
       .chanel-info-row-item {

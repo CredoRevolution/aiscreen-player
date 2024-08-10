@@ -25,9 +25,11 @@
           :form-field="'method'"
           :formPlace="['ipv4']"
           :defaultValue="
-            activeNetwork && activeNetwork.network.wifi.ipv4.method
+            activeNetwork &&
+            activeNetwork.network.wifi &&
+            activeNetwork.network.wifi.ipv4
               ? { name: activeNetwork.network.wifi.ipv4.method }
-              : { name: '' }
+              : { name: 'Automatic DHCP' }
           "
           @getData="getData"
           ref="validation1"
@@ -39,12 +41,14 @@
           :formPlace="['ipv4']"
           :input-name="'IP'"
           :form-field="'address'"
+          :required="form.ipv4.method === 'Manual (Static IP)'"
           :defaultName="
-            activeNetwork && activeNetwork.network.wifi.ipv4.address
+            activeNetwork &&
+            activeNetwork.network.wifi &&
+            activeNetwork.network.wifi.ipv4
               ? activeNetwork.network.wifi.ipv4.address
               : ''
           "
-          :mask="'###.###.###.###'"
           @getData="getData"
           ref="validation2"
         />
@@ -52,23 +56,29 @@
           v-if="form.ipv4.method === 'Manual (Static IP)'"
           :placeholderText="'Gateway'"
           :defaultErrorText="'Gateway is required'"
+          :required="form.ipv4.address !== ''"
           :formPlace="['ipv4']"
           :form-field="'gateway'"
           :input-name="'gateway'"
-          :mask="'###.###.###.###'"
           :defaultName="
-            activeNetwork && activeNetwork.network.wifi.ipv4.gateway
+            activeNetwork &&
+            activeNetwork.network.wifi &&
+            activeNetwork.network.wifi.ipv4
               ? activeNetwork.network.wifi.ipv4.gateway
               : ''
           "
           @getData="getData"
           ref="validation3"
-          :required="form.ipv4.address !== ''"
         />
       </div>
       <div class="advanced-settings__wrapper" v-show="selectedTab === 'DNS'">
         <CustomInput
-          v-for="(adress, index) in serverIPAdressAmount"
+          v-for="(adress, index) in activeNetwork &&
+          activeNetwork.network.wifi &&
+          activeNetwork.network.wifi.dns &&
+          activeNetwork.network.wifi.dns.length > 0
+            ? activeNetwork.network.wifi.dns
+            : serverIPAdressAmount"
           :key="index"
           :placeholderText="'Server IP Address'"
           :defaultErrorText="'Server IP address is required'"
@@ -76,12 +86,23 @@
           :ipAddress="true"
           :form-field="`${index}`"
           :input-name="'DNS'"
-          :mask="'###.###.###.###'"
+          :defaultName="
+            activeNetwork &&
+            activeNetwork.network.wifi &&
+            activeNetwork.network.wifi.dns
+              ? activeNetwork.network.wifi.dns[index]
+              : ''
+          "
           @getData="getData"
           deletable
           ref="validation4"
         />
-        <div class="dns-btn" @click="serverIPAdressAmount++">
+        <div
+          class="dns-btn"
+          @click="
+            serverIPAdressAmount++ && activeNetwork.network.wifi.dns.push('')
+          "
+        >
           Add more
           <img :src="require('@/assets/img/add.svg')" alt="add more" />
         </div>
@@ -93,9 +114,18 @@
             :defaultErrorText="'Host is required'"
             :formPlace="['proxy', 'server']"
             :formField="'address'"
-            :required="form.proxy.server.port !== ''"
+            :required="
+              form.proxy.server.port !== '' &&
+              activeNetwork &&
+              activeNetwork.proxy &&
+              activeNetwork.proxy.port
+            "
             :input-name="'host'"
-            :mask="'####.####.####.####'"
+            :defaultName="
+              activeNetwork && activeNetwork.proxy && activeNetwork.proxy.server
+                ? activeNetwork.proxy.server.address
+                : ''
+            "
             @getData="getData"
             ref="validation5"
           />
@@ -105,8 +135,17 @@
             :formPlace="['proxy', 'server']"
             :formField="'port'"
             :input-name="'port'"
-            :required="form.proxy.server.address !== ''"
-            :mask="'#####'"
+            :required="
+              form.proxy.server.address !== '' &&
+              activeNetwork &&
+              activeNetwork.proxy &&
+              activeNetwork.proxy.address
+            "
+            :defaultName="
+              activeNetwork && activeNetwork.proxy && activeNetwork.proxy.server
+                ? activeNetwork.proxy.server.port
+                : ''
+            "
             @getData="getData"
             ref="validation6"
           />
@@ -114,10 +153,17 @@
       </div>
       <div class="advanced-settings__wrapper" v-show="selectedTab === 'NTP'">
         <CustomInput
-          v-for="(adress, index) in NTPAmount"
+          v-for="(adress, index) in activeNetwork &&
+          activeNetwork.ntp &&
+          activeNetwork.ntp.length > 0
+            ? activeNetwork.ntp
+            : NTPAmount"
           :key="index"
           :placeholderText="'NTP'"
           :defaultErrorText="'NTP is required'"
+          :defaultName="
+            activeNetwork && activeNetwork.ntp ? activeNetwork.ntp[index] : ''
+          "
           :formPlace="['ntp']"
           :form-field="`${index}`"
           :input-name="'ntp'"
@@ -125,7 +171,7 @@
           deletable
           ref="validation7"
         />
-        <div class="dns-btn" @click="NTPAmount++">
+        <div class="dns-btn" @click="NTPAmount++ && activeNetwork.ntp.push('')">
           Add more
           <img :src="require('@/assets/img/add.svg')" alt="add more" />
         </div>
@@ -200,6 +246,7 @@ export default {
       return this.$store.getters.activeNetwork
     },
   },
+
   components: { CustomTabs, SearchSelect, CustomInput },
   methods: {
     showAdvanced() {
@@ -268,7 +315,7 @@ export default {
           }
         }
       })
-
+      console.log(this.validationCount, visibleValidations)
       if (this.validationCount === visibleValidations) {
         return true
       }

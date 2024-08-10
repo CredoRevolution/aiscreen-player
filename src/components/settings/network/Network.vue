@@ -20,6 +20,7 @@
           @getData="getData"
           @clearNetwork="clearNetwork"
           @addNetwork="createNewNetwork"
+          @connectToNetwork="connectToNetwork"
           ref="validation01"
         />
         <SearchSelect
@@ -31,7 +32,7 @@
               ? {
                   name: activeNetwork.network.wifi.Frequency,
                 }
-              : { name: '2.6gHz' }
+              : { name: '' }
           "
           :search="false"
           :defaultText="'Network frequency'"
@@ -53,7 +54,7 @@
               ? {
                   name: activeNetwork.network.wifi.Authentification,
                 }
-              : { name: 'None' }
+              : { name: '' }
           "
           :form-place="['network', 'wifi']"
           :formField="'Authentification'"
@@ -652,15 +653,22 @@ export default {
 
     // Создает новую сеть
     createNewNetwork() {
-      this.clearNetwork()
       this.creatingNewNetwork = true
-      this.$refs.validation01._data.active = true
       this.resetForm()
+      this.clearNetwork()
+      this.$refs.validation01._data.active = true
+      this.$refs.validation01.resetValidation()
     },
-
+    connectToNetwork(network) {
+      this.creatingNewNetwork = false
+      this.$store.commit('setActiveNetwork', network)
+    },
     // Сохраняет настройки сети
     saveSettings() {
-      if (this.checkAllValidations()) {
+      if (
+        this.checkAllValidations() &&
+        this.$refs.advancedSettings.checkAllValidations()
+      ) {
         const formCopy = JSON.parse(JSON.stringify(this.form))
         const store = this.$store
         if (this.creatingNewNetwork) {
@@ -683,7 +691,9 @@ export default {
     editNetwork(formCopy, store) {
       const availableNetworks = store.getters.availableNetworks.slice()
       const index = availableNetworks.findIndex(
-        (network) => network.id === store.getters.activeNetwork.id
+        (network) =>
+          network.network.wifi.ssid ===
+          store.getters.activeNetwork.network.wifi.ssid
       )
       if (index !== -1) {
         availableNetworks[index] = formCopy
