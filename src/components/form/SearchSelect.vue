@@ -213,8 +213,6 @@ export default {
   watch: {
     defaultValue: {
       handler(newValue) {
-        console.log(this.isUserSelected)
-
         if (this.isUserSelected) return
         if (!this.isUserSelected) {
           this.value = newValue

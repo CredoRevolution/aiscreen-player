@@ -320,6 +320,22 @@ export default {
         return true
       }
     },
+    clearNetwork() {
+      const fields = [
+        'validation1',
+        'validation2',
+        'validation3',
+        'validation4',
+        'validation5',
+        'validation6',
+        'validation7',
+        'validation8',
+      ].map((ref) => this.$refs[ref])
+
+      fields.forEach((field) => {
+        if (field && field.$el) field.clearField()
+      })
+    },
   },
   mounted() {
     this.selectedTab = 'IP Address'

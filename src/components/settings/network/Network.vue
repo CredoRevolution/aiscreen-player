@@ -658,6 +658,7 @@ export default {
       this.clearNetwork()
       this.$refs.validation01._data.active = true
       this.$refs.validation01.resetValidation()
+      this.$refs.advancedSettings.clearNetwork()
     },
     connectToNetwork(network) {
       this.creatingNewNetwork = false
